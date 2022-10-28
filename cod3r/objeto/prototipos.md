@@ -88,38 +88,40 @@ elementos dessa lista.
 - A propriedade `__proto__` referência o objeto pai daquela instância na cadeia de protótipos.
 
 - Na declaração de um objeto, ele possui um papel similar ao `extends`, classicamente utilizado para indicar uma relação de herança entre classes.
-    - Exemplo:
+- Exemplo:
 
-        ```
-        const avo = {
-            nome: 'Adenor',
-            saudacao() {
-                console.log(`Olá, meu nome é ${this.nome}!`);
-            }
-        };
+    ```
+    const avo = {
+        nome: 'Adenor',
+        saudacao() {
+            console.log(`Olá, meu nome é ${this.nome}!`);
+        }
+    };
 
-        const pai = {
-            __proto__: avo,
-            nome: 'Carlos'
-        };
+    const pai = {
+        __proto__: avo,
+        nome: 'Carlos'
+    };
 
-        const filho = {
-            __proto__: pai,
-            nome: 'José'
-        };
+    const filho = {
+        __proto__: pai,
+        nome: 'José'
+    };
 
-        filho.saudacao();
-        ```
+    filho.saudacao();
+    ```
 
-        - Traduzindo, `__proto__` está indicando que o objeto `pai` é filho direto do objeto `avo` e portanto, "herda" todas as suas
-        propriedades. O objeto `filho`, por sua vez, "herda" as propriedades de `pai` e, consequentemente, as de `avo`, formando a cadeia de protótipos;
-        - Quando executamos o comando `filho.saudacao()`, o interpretador do JavaScript verifica se o método em questão encontra-se em `filho`. Como no caso o método não encontra-se nessa instância, ele verifica se seu ancestral direto possui. Para saber qual seu ancestral e acessá-lo, ele utiliza a referência armazenada em `__proto__`;
-        - O mesmo processo ocorre em `pai`, até chegar na instância `avo`, onde de fato o método encontra-se alocado e o mesmo é executado. Caso este não possuísse o método em questão, seria verificado se o pai de `avo`, `Object.prototype`, o possui, e em caso negativo, por tratar-se da raiz da cadeia de protótipos, seria retornado o valor `undefined`;
-        - Podemos perceber com esse exemplo que o que houve não foi uma herança das propriedades de seus ancestrais pelo objeto `filho`, e sim uma delegação de tarefas para instâncias superiores da cadeia de protótipos;
-        - Esse é um método mais otimizado, se comparado ao método tradicional de herança utilizado por linguagens como o Java, uma vez que elimina redundâncias, evitando que sejam criadas várias cópias de um mesmo método;
-        - O caminho realizado pela cadeia de protótipos está ilustrado na seguinte imagem:
+    - Traduzindo, `__proto__` está indicando que o objeto `pai` é filho direto do objeto `avo` e portanto, "herda" todas as suas
+    propriedades. O objeto `filho`, por sua vez, "herda" as propriedades de `pai` e, consequentemente, as de `avo`, formando a cadeia de protótipos;
+    - Quando executamos o comando `filho.saudacao()`, o interpretador do JavaScript verifica se o método em questão encontra-se em `filho`. Como no caso o método não encontra-se nessa instância, ele verifica se seu ancestral direto possui. Para saber qual seu ancestral e acessá-lo, ele utiliza a referência armazenada em `__proto__`;
+    - O mesmo processo ocorre em `pai`, até chegar na instância `avo`, onde de fato o método encontra-se alocado e o mesmo é executado. Caso este não possuísse o método em questão, seria verificado se o pai de `avo`, `Object.prototype`, o possui, e em caso negativo, por tratar-se da raiz da cadeia de protótipos, seria retornado o valor `undefined`;
+    - Podemos perceber com esse exemplo que o que houve não foi uma herança das propriedades de seus ancestrais pelo objeto `filho`, e sim uma delegação de tarefas para instâncias superiores da cadeia de protótipos;
+    - Esse é um método mais otimizado, se comparado ao método tradicional de herança utilizado por linguagens como o Java, uma vez que elimina redundâncias, evitando que sejam criadas várias cópias de um mesmo método;
+    - O caminho realizado pela cadeia de protótipos está ilustrado na seguinte imagem:
 
-        ![Cadeia de protótipos filho, pai e avo](./imgs/prototype-chain-1.png)
+    ![Cadeia de protótipos filho, pai e avo](./imgs/prototype-chain-1.png)
+
+    - A seta vermelha indica em que ponto da cadeia de protótipos o método procurado foi encontrado.
 
 - Esse mesmo processo acontece com nossa instância `p` de `Pessoa`, que tenta invocar o método `hasOwnProperty` sendo que nem o possui, e acabando encontrando-o em `Object.prototype`:
 
