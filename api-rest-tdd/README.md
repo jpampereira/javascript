@@ -1,24 +1,24 @@
 # API REST em Node.JS aplicando testes (TDD) desde o princípio
 
-- A divisão dos capítulos segue a mesma do curso
+## 1. Links
 
-**COLOCAR LINK DO CURSO**
+[Curso](/)
 
-**COLOCAR LINK PARA O REPOSITÓRIO DO PROJETO**
+[Repositório do Projeto](/)
 
-## 1. Introdução
+## 2. API
 
-- API's são importantes pois fornecem dados para diferentes sistemas, não ficando presas a uma linguagem ou natureza da aplicação (web, desktop, mobile, etc.).
+- APIs (Application Programming Interface) são importantes pois fornecem dados para diferentes sistemas, não ficando restritas a uma linguagem ou natureza da aplicação (web, desktop, mobile, etc.).
+
+## 3. TEST DRIVEN DEVELOPMENT (TDD)
+
+- Em português, **Desenvolvimento guiado por testes**.
 
 - Os testes são de extrema importância para garantir a segurança e confiabilidade da nossa aplicação.
 
-- TDD = *Test-driven development* (em português, Desenvolvimento guiado por testes).
+## 4. Projeto Node.JS
 
-**FALAR SOBRE TDD**
-
-## 2. Iniciando a API
-
-### 2.1. Devo criar o projeto
+### 4.1. Inicialização do Projeto
 
 - Para iniciar um projeto em Node.JS, devemos executar o seguinte comando:
 
@@ -26,26 +26,112 @@
     npm init -y
     ```
 
-    - `npm`: Gerenciador de pacotes do Node (Node Package Manager);
-    - `-y`: Caso não insira essa *flag*, serão feitas diversas perguntas. Nesse caso, todas são respondidas com *yes*.
+    | Comando | Descrição                                                                                                                |
+    | ------- | ------------------------------------------------------------------------------------------------------------------------ |
+    | `npm`   | Gerenciador de pacotes do Node (Node Package Manager)                                                                    |
+    | `-y`    | Caso não insira essa *flag*, serão feitas diversas perguntas. Utilizando esse parâmetro, todas são respondidas com *yes* |
 
-- Inicialmente é criado um arquivo `package.json` que armazena informações referentes à aplicação, como nome, versão, descrição, autor, dependências, etc.
+- Inicialmente, serão criados os arquivos `package.json` que armazena informações referentes à aplicação, como nome, versão, descrição, autor, dependências, etc., e o arquivo `package-lock.json`, que traz mais detalhes sobre as dependências da aplicação.
 
-- Podemos instalar a dependência **ESLINT** para nos ajudar a manter a organização/padronização do código:
+### 4.2. O arquivo `package.json`
+
+- Estrutura básica de um arquivo `package.json`:
 
     ```
-    npm i -D eslint
+    {
+        "name": "node",
+        "version": "1.0.0",
+        "description": "",
+        "main": "index.js",
+        "scripts": {
+            "test": "echo \"Error: no test specified\" && exit 1"
+        },
+        "keywords": [],
+        "author": "",
+        "license": "ISC",
+        "devDependencies": {
+            "devDependencie1": "^0.0.0",
+            "devDependencie2": "~0.0.0",
+            "devDependencie3": "0.0.0"
+        }
+        "dependencies": {
+            "dependencie1": "^0.0.0",
+            "dependencie2": "~0.0.0",
+            "dependencie3": "0.0.0"
+        }
+    }
     ```
 
-    - `i` ou `install`: indica que será realizada uma instalação;
-    - `-D` ou `--save-dev`: indica que a dependência em questão deve ser salva como dependência apenas de desenvolvimento;
-    - `eslint`: dependência instalada.
+- Descrição dos principais campos desse arquivo:
 
-- Os arquivos da dependência instalada ficam no diretório `node_modules`.
+    | Campo             | Descrição                                                                         |
+    | ----------------- | --------------------------------------------------------------------------------- |
+    | `name`            | Nome da aplicação                                                                 |
+    | `version`         | Versão da aplicação                                                               |
+    | `description`     | Descrição da aplicação                                                            |
+    | `main`            | Arquivo que deve ser executado primeiro quando a aplicação for executada          |
+    | `scripts`         | Podemos criar atalhos para execução de comandos e/ou scripts via linha de comando |
+    | `keywords`        | Palavras-chave relacionadas à aplicação                                           |
+    | `author`          | Autores da aplicação                                                              |
+    | `license`         | Licenças da aplicação                                                             |
+    | `devDependencies` | Dependências em fase desenvolvimento da aplicação                                 |
+    | `dependencies`    | Dependências em fase de produção da aplicação                                     |
 
-- Evitar instalar dependências de forma global.
+### 4.3. Instalação de Dependências
 
-- Para iniciar o **ESLINT**, devemos digitar o seguinte comando:
+- Para instalar uma dependência, devemos executar o seguinte comando:
+
+    ```
+    npm install <nome-dependencia>
+    ```
+
+- Parâmetros que podem ser utilizados junto do comando de instalação:
+
+    | Comando              | Descrição                                                                                                                                                     |
+    | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+    | `i` ou `install`     | Comando para instalação de dependências                                                                                                                       |
+    | `-D` ou `--save-dev` | Indica que a dependência em questão é necessário apenas durante o desenvolvimento da aplicação                                                                |
+    | `-S` ou `--save`     | Indica que a dependência em questão é necessária para o correto funcionamento da aplicação quando disponibilizada em produção                                 |
+    | `-g` ou `--global`   | Indica que a dependência deve ser instalada de forma global, não sendo necessário executar o comando novamente caso a mesma seja utilizada em outros projetos |
+    | `-E`                 | Indica que a dependência instalada deve ser sempre utilizada na versão indicada (provavelmente para evitar problemas de compatibilidade entre versões)        |
+
+- Os arquivos das dependências instaladas ficam no diretório `node_modules`.
+
+- Evite instalar dependências de forma global.
+
+### 4.4. Versionamento
+
+- Durante a instalação de uma dependência, podemos especificar a versão que desejamos instalar (caso essa informação não seja inserida, a versão `latest` disponível no `npm` será instalada):
+
+    ```
+    npm install <nome-dependencia>@<versao>
+    ```
+
+- Como exemplo, seja `23.6.0` a versão de uma dependência utilizada em nosso projeto. O que cada um desses números indica?
+
+    | Número | Nome             | Descrição                                                                                                   |
+    | ------ | ---------------- | ----------------------------------------------------------------------------------------------------------- |
+    | 23     | Upgrade Major    | Indica que a versão adiciona novas funcionalidades que implicam em problema de compatibilidade              |
+    | 6      | Upgrade Minor    | Indica que a versão adiciona novas funcionalidades, porém, que não implicam em problemas de compatibilidade |
+    | 0      | Upgrade de Patch | Indica que a versão em questão realiza correções de bugs                                                    |
+
+- No arquivo `package.json`, onde são listadas as dependências do projeto, podemos especificar as versões aceitas pelas mesmas
+
+    ```
+    "dependencies": {
+        "dependencia1": "23.6.0"  // Instalar a versão exata
+        "dependencia2": "^23.6.0" // Caso existam versões mais recentes de Upgrade Minor, podem ser instaladas
+        "dependencia3": "~23.6.0" // Caso existam versões mais recentes de Upgrade de Patch, podem ser instaladas
+    }
+    ```
+
+## 5. ESLINT
+
+- A dependência `eslint` nos ajuda a manter a organização/padronização do código de acordo com as tendências utilizadas no mercado.
+
+### 5.1. Inicialização
+
+- Após sua instalação, executamos o seguinte comando para iniciá-la:
 
     ```
     ./node_modules/.bin/eslint --init
@@ -54,20 +140,9 @@
     - Algumas perguntas serão realizadas e no fim mais algumas dependências serão instaladas.
     - O arquivo `eslintrc.json` é criado e armazena as configurações do lint.
 
-- Devem ser criados os diretórios `src` para armazenar os códigos da nossa aplicação e `test` para armazenar os testes.
-    - Estrutura de diretórios inicial:
+### 5.2. Executando através de scripts
 
-    ```
-    seubarriga
-        node_modules
-        src
-        test
-        .eslintrc.json
-        package-lock.json
-        package.json
-    ```
-
-- No arquivo `package.json`, nós podemos criar atalhos para executar determinados scripts e/ou comandos no terminal.
+- Como já dito anteriormente, no arquivo `package.json`, podemos criar atalhos para executar determinados scripts e/ou comandos via linha de comando.
     - No atributo `scripts`, definimos um nome como chave e o valor é o que será executado;
     - Exemplo:
         
@@ -77,45 +152,23 @@
         }
         ```
 
-    - Para executar o script na linha de comando:
+    - O parâmetro `--fix` permite que o `eslint` faça correções automaticamente quando executado. Porém, não funciona com todo tipo de erro (consultar documentação).
+    - Para executar o script do exemplo via linha de comando:
 
         ```
         npm run lint
         ```
 
-    - O parâmetro `--fix` permite que o lint faça correções automaticamente quando executado. Porém, não funciona com todo tipo de erro (consultar documentação).
-    - A extensão do ESLINT para Visual Studio Code facilita o uso do LINT para padronizar o seu código, alertando para possíveis erros de formatação em tempo real, sem a necessidade de se executar um comando toda vez que desejar realizar essa verificação.
+- Algumas palavras como `start` e `test` já são reconhecidas pelo Node, portante, não necessitam do comando `run`.
 
-### 2.2 Devo conhecer o básico das asssertivas do Jest
+- A extensão **ESLINT** para **Visual Studio Code** facilita o uso do LINT para padronizar o seu código, alertando para possíveis erros de formatação em tempo real, sem a necessidade de se executar um comando toda vez que desejar realizar essa verificação.
 
-- Para instalar o JEST:
 
-    ```
-    npm install -D jest@23.6.0 -E
-    ```
+## 6. Desenvolvimento Orientado à Testes com o JEST
 
-    - `@23.6.0`: indica a versão que deve ser instalada;
-    - `-E`: Informa que não deve ser aceitas outras versões (instalar a versão exata).
+- O JEST permite a criação de scripts para automatização de testes em aplicações Node.JS.
 
-- Como funciona o versionamento:
-
-    ```
-    23.6.0
-    ```
-
-    | Número | Descrição | Nome |
-    | ------ | --------- | ---- |
-    | 23 | Indica que a versão adiciona novas funcionalidades que implicam em problema de compatibilidade | Upgrade Major
-    | 6 | Indica que a versão adiciona novas funcionalidades, porém, que não implicam em problemas de compatibilidade | Upgrade Minor
-    | 0 | Indica que a versão em questão realiza correções de bugs | Upgrade de patch
-
-    - Você pode definir no seu `package.json` qual o tipo de versão que deve ser permitida:
-
-        ```
-        "eslint": "23.6.0"  // Versão exata
-        "eslint": "^23.6.0" // Aceita upgrade minor
-        "eslint": "~23.6.0" // Aceita upgrade de patch
-        ```
+### 6.1. Inicialização
 
 - O arquivo de testes deve ter a extensão `.test.js`.
 
@@ -127,7 +180,13 @@
     }
     ```
 
-- Por padrão, o ESLINT utiliza o LF, costumeiramente utilizado em sistemas UNIX, como caractére de quebra de linha, enquanto o Windows utiliza o CRFL. Caso estejamos desenvolvendo nossa aplicação em um sistema Windows, podemos indicar qual caractére de quebra de linha seguir:
+- Os testes funcionam como documentação da solução. Caso alguém solicite, você pode apresentar os critérios utilizados no desenvolvimento e que os testes passam em todos eles.
+
+### 6.2. Problema do caractére de quebra de linha
+
+- Por padrão, o `eslint` utiliza o **LF** (*Line Feed*), costumeiramente utilizado em sistemas UNIX, como caractére de quebra de linha, enquanto o Windows utiliza o CRLF (*Carriage Return-Line Feed*). 
+
+- Podemos definir no arquivo `eslintrc.json` qual o sistema utilizado na aplicação, para que ele identifique o caractére de quebra de linha corretamente:
 
     ```
     "rules": {
@@ -135,7 +194,17 @@
     }
     ```
 
-    - Se quisermos desativar regras também utilizamos esse trecho do arquivo (consultar documentação para saber como manipular cada uma das regras).
+- Podemos também desativar essa regra:
+
+    ```
+    "rules": {
+        "linebreak-style: "off"
+    }
+    ```   
+
+- Consultar a documentação para saber como manipular cada uma das regras.
+
+### 6.3. Diretivas
 
 - Formato básico de um teste:
 
@@ -156,33 +225,49 @@
         expect(num).toBeGreaterThan(9);
         expect(num).toBeLessThan(11);
     });
+
+    test('Verifica array e objeto', () => {
+        const arr = [
+            { name: 'João Pedro', mail: 'joao@mail.com' }
+        ];
+
+        expect(arr).toHaveLength(1);
+        expect(aar[0]).toHaveProperty('name', 'João Pedro');
+    });
     ```
 
-    - Existem várias outras verificações que podem ser feitas, inclusive manipulando objetos.
+    - A propriedade `toHaveProperty` verifica se o objeto possui determinada propriedade.
+        - Se passado um parâmetro, é verificado se o objeto possui aquele atributo;
+        - Se passado dois parâmetros, é verificado se o objeto possui algum atributo com o nome passado no primeiro parâmetro e se o mesmo possui como valor o passado no segundo parâmetro.
 
-### 2.3. Deve responder na porta 3001
+- Uma função interessante do arquivo de testes é permitir definirmos que um teste deve ser ignorado ou que apenas ele deve ser executado:
 
-- Os testes funcionam como documentação da solução.
-    - Caso alguém solicite, você pode apresentar os critérios utilizados no desenvolvimento e que os testes passam em todos eles.
+    ```
+    test.only('...', () => { ... }); // Apenas ele será executado e os demais ignorados
+    test.skip('...', () => { ... }); // O teste em questão será ignorado
+    ```
 
-- O Express é um framework que permite a construção de servidores web em Node.JS.
-    - Para instalá-lo:
+    - No resultado final, os testes ignorados aparecerão como `skipped`.
 
-        ```
-        npm i -S -E express@4.16.4
-        ```
+- Com a diretiva `beforeAll`, podemos determinar um bloco de código que será executado uma única vez antes de todos os testes.
+    - No contexto do projeto, essa diretiva foi utilizada para sempre criar um único usuário antes dos testes e assim gerar o token de acesso, não sendo necessário criá-los separadamente o que acaba gerando redundância no código.
 
-        - `-S` ou `--save`: Salva como uma dependência da aplicação, ou seja, no que a mesma for disponibilizada em produção, essa dependência é essencial para o seu perfeito funcionamento.
+- Outra opção é a diretiva `beforeEach`, que executa o bloco de código associado antes de cada um dos testes.
+    - No contexto do projeto, essa diretiva foi utilizada para criar um usuário diferente em cada um dos testes para evitar situações de conflito entre testes.
 
-- A biblioteca `supertest` nos permite testar APIs de forma facilitada.
+- A diretiva `describe` nos permite agrupar dois ou mais testes para que eles sejam compreendidos pelo JEST como um único.
+    - Incentiva a reutilização de código;
+    - Caso utilizemos diretivas como `beforeAll` ou `beforeEach` dentro desse bloco, eles serão executados apenas para os testes que também encontram-se nesse escopo. 
 
-### 2.4. Deve responder na raiz
+### 6.4. Desempenho
 
-- Separar a aplicação (`app`) do servidor (`server`) faz com que não precisemos determinar endereço, porta e nem subir a aplicação durante o período de desenvolvimento e testes, fazendo isso apenas na entrega em produção.
+- Devemos nos atentar a questões de desempenho dos testes. Pode ser que em algumas situações os testes podem demorar mais do que o adequado por realizar diversas operações como interação via HTTP e acesso à bancos de dados.
 
-### 2.5. Devo trabalhar no modo seguro:
+- Caso o tempo de um teste seja acima do adequado, o tempo desse teste será destacado em vermelho no console, ao final da sua execução.
 
-- O modo seguro não é algo nativoe sim uma proposta do autor para tornar o desenvolvimento mais seguro.
+### 6.5. Modo Seguro
+
+- O modo seguro não é algo nativo e sim uma proposta do autor para tornar o desenvolvimento mais seguro.
 
 - A ideia é que os testes sejam executados toda vez que houver uma alteração nos arquivos da aplicação ou de testes e que essas sejam salvas.
     - Isso garante a segurança no desenvolvimento, facilitando o encontro de erros no código em tempo de desenvolvimento e facilitando o retorno à um estado consistente anterior.
@@ -195,198 +280,121 @@
 
 - Podemos inclusive criar um script para esse comando no `package.json` e chamá-lo de `secure-mode`.
 
-## 3. /users
+## 7. Bancos de Dados em Node.JS com Knex
 
-### 3.1. Devo listar todos os usuários
+- O `knex` é uma biblioteca que permite a manipulação de bancos de dados através do Node.JS.
+    - Suporta diversos sistemas, como: Postgres, MariaDB, Oracle, etc.;
+    - Knex é um Query Builder, que permite a criação de querys SQL a partir de código JavaScript, tornando-o mais flexível e evitando misturar JS com SQL, o que acaba causando uma poluição na escrita.
 
-- Nessa primeira funcionalidade, o usuário deve ser capaz de fazer um *GET* em `/user` e a aplicação deve retornar uma lista com todos os usuários cadastrados.
+### 7.1. O arquivo `knexfile.js`
 
-```
-test('Deve listar todos os usuários', async () => {
-    await request(app).get('/users')
-        .then((res) => {
-            expect(res.status).toBe(200);
-            expect(res.body).toHaveLength(1);
-            expect(res.body[0]).toHaveProperty('name', 'John Doe');
-        });
-});
-```
+- No arquivo de configuração do Knex (`knexfile.js`) nós especificamos as informações referentes aos bancos de dados de testes, homologação e produção, como endereço, porta, usuário, senha, sistema gerenciador de banco de dados utilizado e sua versão. 
 
-- Toda requisião HTTP retorna uma Promise, por isso utilizamos o `then` para ter acesso ao conteúdo da resposta em caso de sucesso.
+### 7.2. Inicialização
 
-- Uma request bem sucedida sempre retorna o status **200**.
-
-- A lista de usuários pode ser obtida no `body` da resposta.
-
-- A propriedade `toHaveProperty` verifica se o objeto possui determinada propriedade.
-    - Se passado um parâmetro, é verificado se o objeto possui aquele atributo;
-    - Se passado dois parâmetros, é verificado se o objeto possui algum atributo com o nome passado no primeiro parâmetro e se o mesmo possui como valor o passado no segundo parâmetro.
-
-```
-app.get('/users', (req, res) => {
-    const users = [
-        { name: 'John Doe', mail: 'john@mail.com' },
-    ]
-
-    res.status(200).json(users);
-});
-```
-
-- Todo endpoint desenvolvido possui dois parâmetros: o primeiro é o caminho para acessar aquela funcionalidade e o segundo é o método que determina o que será feito quando o usuário realizar uma requisição.
-    - Esse método possui dois parâmetros: requisição (`req`) e resposta (`res`). Todas as informações enviadas na requisição são acessadas em `req` e tudo o que deve ser retornado para o requisitante é armazenado em `res`;
-    - O método `.json()` converte o valor passado como parâmetro para o formato JSON, o anexa ao  `body` da resposta e envia para o requisitante.
-
-### 3.2. Deve inserir usuário com sucesso
-
-```
-test('Deve inserir usuário com sucesso', async () => {
-    await request(app).post('/users')
-        .send({ name: 'Walter Mitty', mail: 'walter@mail.com' })
-        .then((res) => {
-            expect(res.status).toBe(200);
-            expecy(res.body.name).toBe('Walter Mitty')
-        });
-});
-```
-
-- Quando desejamos inserir novos dados na nossa aplicação, realizamos uma requisição *POST* para a nossa API. Nesse caso, devemos indicar os dados que devem ser inseridos no `body` da requisição, utilizando o método `.send()`, que antes de anexar e enviar os dados, os converte para JSON. 
-
-- Utilizamos o que chamamos de verbos HHTP para fazer as requisições de acordo com a operação que desejamos realizar.
-    - Existem diversos verbos, mas os quatro mais utilizados que dizem respeito as operações de CRUD (CREATE, READ, UPDATE, DELETE) são:
-
-        | Verbo | Descrição |
-        | ----- | --------- |
-        | GET | Obter dados |
-        | POST | Inserir novos dados |
-        | PUT | Alterar dados existentes |
-        | DELETE | Remover dados|
-
-    - Podemos haver dois endpoints com o mesmo endereço, desde que utilizem verbos diferentes.
-
-- Para conseguir manipular as informações enviadas no `body` da requisição do lado da aplicação, é necessário realizar uma conversão. Para isso utilizamos o `body-parser`, um módulo utilizado para converter o `body`da requisição para diferentes formatos, entre eles, o JSON.
-
-```
-const bodyParser = require('body-parser');
-
-app.use(bodyParser.json());
-
-app.post('/users', (req, res) => {
-    res.status(200).json(req.body);
-});
-```
-
-### 3.3. Devo organizar meus arquivos
-
-- *Middlewares* são funções que são executadas durante o processamento de uma requisição.
-    - O `body-parser` é um exemplo, pos ele é executado toda vez que uma requisição do tipo POST é realizada, para converter as informações do body da requisição para o formato esperado pela aplicação;
-    - Podemos separá-los em outro arquivo no diretório `src/config`;
-    - O método `app.use()` é utilizado para extendermos o Express com outros módulos. Essa extensão é feita através da adição de middlewares que serão executados sempre antes de qualquer requisição ser processada.
-
-- O `consign` é uma dependência que facilita a gestão dos módulos de uma aplicação, fazendo um *autoload*.
-    - Na nossa aplicação, utilizamos o `consign` para dividir responsabilidades como as rotas configuradas e os serviços de banco de dados em diferentes arquivos, trazendo maior organização para o código:
+- Após a instalação da dependência, devemos integrá-la a nossa aplicação:
 
     ```
-    consign({ cwd: 'src' }) // Indica o diretório que o consign deve olhar
-        .include('./config/middlewares.js')
-        .into(app);
+    const app = require('express')();
+    const knex = require('knex');
+
+    const knexFile = require('../knexfile');
+
+    app.db = knex(knexFile.test);
     ```
 
-    - No código acima, o `consign` importa o módulo configurado em `middlewares.js`.
-    - O módulo deve respeitar o seguinte formato para que o `consign` consiga importá-lo:
-
-        ```
-        module.exports = (app) => {
-            // ...
-        }
-        ```
-
-    - Caso o desejo seja inserir algum atributo ou método em `app`, deve-se colocar um retorno ao final da *arrow function*.
-
-### 3.4. Devo criar arquivo de rotas
-
-- Uma boa prática é separar as rotas criadas em arquivos, afim de aumentar a organização do projeto.
-
-- O método `app.route()` permite a criação de rotas de forma encadeada, eliminando redundâncias e tornando o código mais organizado.
-
-### 3.5. Devo instalar o postgress
-
-- Não foram realizadas anotações dessa aula.
-
-### 3.6. Devo criar a estrutura da tabela de usuários
-
-- O `Knex` é uma biblioteca que permite a manipulação de bancos de dados através do Node.JS.
-    - Suporta diversos sistemas, como: Postgres, MariaDB, Oracle, etc;
-    - Knex é um Query Builder, que permite a criação de querys SQL a partir de código JavaScript, tornando o código mais flexível e evitando misturar código JS com SQL, o que acaba causando uma poluição da escrita.
+### 7.3. Migrations
 
 - Ao longo da vida útil de uma aplicação, mudanças estruturais podem ocorrer nos bancos de dados o qual a API interage, como adição ou remoção de tabelas e colunas, alteração nos seus nomes, etc.
     - Porém, pode ser difícil manter essas mudanças rastreáveis, construindo uma linha do tempo. Nesse caso as `migrations` irão ajudar;
     - Migrations são arquivos que definem mudanças estruturais nos bancos de dados;
-    - Elas ficam armazenadas em `src/migrations` (ou outro diretório que você determina no arquivo de configuração do Knex);
-    - Para criar uma `migration`:
+
+- Devemos inicialmente definir no arquivo `knexfile.js` onde os arquivos de migration serão depositados.
+
+- Para criar uma migration:
 
     ```
-    node_modules/.bin/knex migrate:make <migration-name> --env <environment>
+    node_modules/.bin/knex migrate:make <nome-arquivo> --env <ambiente>
     ```
 
-    - No arquivo criado, deve se definir duas funções: `up` e `down`. A primeira é o comando que será executado para realizar aquela alteração, enquanto a segunda é o comando que irá desfazer a alteração realizada, caso necessário;
-    - Na frente do nome do arquivo de migration gerado há o timestamp da sua criação, para que se saiba a ordem de realização das alterações;
-    - Para executar a alteração de uma migration:
+- Estrutura básica de um arquivo de migration:
 
     ```
-    node_modules/.bin/knex migrate:<migration-name> --env <environment>
-    ```
+    exports.up = (knex, Promise) => {
 
-    - No arquivo de configuração do knex (`knexfioe.js`) nós especificamos as informações referentes aos bancos de dados de testes, homologação e produção, como endereço, porta, usuário, senha, sistema gerenciador de banco de dados utilizado, além de onde serão criadas as migrations. 
+    };
 
+    exports.down = (knex, Promise) => {
 
-### 3.7. Devo refatorar para usar o banco de dados
-
-- Para utilizarmos o Knex em nossa aplicação, devemos integrá-lo:
-
-```
-const knex = require('knex');
-
-const knexfile = require('../knexfile');
-
-app.db = knex(knexfile.test);
-```
-
-- Desse modo, devemos refatorar o código para utilizarmos o banco de dados como forma de persistência dos dados em nossa aplicação:
-
-    ```
-    module.exports = (app) => {
-        const findAll = (req, res) => {
-            app.db('users').select()
-                .then((result) => res.status(200).json(result));
-        };
-
-        const create = async (req, res) => {
-            const result = await app.db('users').insert(req.body, '*');
-            res.status(200).json(result);
-        };
-
-        return { findAll, create };
     };
     ```
+    
+    - No arquivo criado, deve se definir duas funções: `up` e `down`. A primeira é o comando que será executado para realizar a alteração desejada (ex.: criação de uma tabela, adição ou edição de uma coluna, etc.), enquanto a segunda é o comando que irá desfazer a alteração realizada (remoção de tabela, remoção de coluna, etc.), caso necessário;
+    - O parâmetro `knex` é o objeto que contém os métodos de migrations, enquanto o parâmetro `Promise` nos permite executar diferentes atividade paralelamente, através do método `Promise.all()`.
 
-    - A operação realizada por `findAll` é equivalente a:
-
-    ```
-    SELECT * FROM users
-    ```
-
-    - Enquanto a operação `create` é o mesmo que:
+- Exemplo da criação da tabela `users`:
 
     ```
-    INSERT INTO users ("mail", "name", "passwd")
-    VALUES ("walter@mail.com", "Walter Mitty", "123456")
-    RETURNING *;
+    exports.up = (knex, Promise) => {
+        return knex.schema.createTable('users', (t) => {
+            t.increments('id');
+            t.string('name').notNull(); // tipo do campo, nome do campo, constraints
+            t.string('mail').notNull();
+            t.string('passwd').notNull();
+        });
+    };
+
+    exports.down = (knex, Promise) => {
+        return knex.schema.dropTable('users');
+    }
     ```
 
-    - O `RETURNING` não funciona em MySQL;
-    - Quando o `RETURNING` é configurado, a promise de `INSERT` retorna um array com todos os valores inseridos. Ou seja, é possível inserir mais de uma linha no banco em uma mesma requisição, basta colocá-las dentro de uma lista.
+- Na frente do nome do arquivo de migration gerado, há o *timestamp* da sua criação, para que se saiba a ordem de realização das alterações;
 
-### 3.8. Devo logar consultas
+- Para executar a alteração de uma migration:
+
+    ```
+    node_modules/.bin/knex migrate:<nome-arquivo> --env <ambiente>
+    ```
+
+- Para desfazer uma migration:
+
+    ```
+    node_modules/.bin/knex migrate:rollback --env <ambiente>
+    ```
+
+    - Digamos que em um cenário hipotético você realiza o *rollback* em três migrations que foram inseridas uma a uma. Se você em seguida executar `migrate:latest`, ele irá refazer as três migrations, na ordem em que elas foram criadas.
+        Agora, se você der um novo *rollback*, as três novamente serão desfeitas, pos o *rollback* não atua apenas em cima da última migration, e sim, no último conjunto de mudanças ocorridas, independentemente dela ter uma ou mais migrations.
+
+### 7.4. Seeds
+
+- Ao longo do curso fizemos a inserção de dados nas tabelas para realização de testes através do JEST, porém, essa técnica, além de mais trabalhosa, acaba poluindo o código.
+
+- A inserção de registros em tabelas através de arquivos de `seeds` é uma opção que torna os códigos de teste mais organizados dividindo responsabilidades: arquivos de teste realizam apenas testes, enquanto arquivos de seeds fazem a inserção de registros nas tabelas do banco de dados.
+
+- Essa funcionalidade não é uma exclusividade do knex e é uma alternativa à criação de scripts SQL ou arquivos XML como utilizado no DBUnit.
+
+- Assim como nas migrations, precisamos indicar no `knexfile.js` onde serão depositados os arquivos de seeds.
+
+- Para criar um arquivo de seed:
+
+    ```
+    node_modules/.bin/knex seed:make <nome-arquivo> --env <ambiente>
+    ```
+
+- Para executar esse arquivo e inserir os dados no banco:
+
+    ```
+    node_modules/.bin/knex seed:run --env <ambiente>
+    ```
+
+- Tomar cuidado com a questão do ID dos registros incluídos, pois a divisão de responsabilidades entre os testes e a inserção dos dados nas tabelas, não nos permite mais obter esses IDs dinamicamente para manipulá-los nos testes. Portanto, uma alternativa é fixar esse ID na inserção do registro no banco, ao invés de deixar que o postgre faça essa atribuição automaticamente. Algumas possibilidades:
+    - Toda vez que for inserir os dados, recriar as tabelas para garantir que os registros sempre vão começar do ID 1;
+    - Fixar IDs altos que dificilmente serão alcançados por registros inseridos via teste;
+    - Usar IDs negativos.
+
+
+### 7.5. Log de consultas ao banco
 
 - Acaba poluindo muito o log, mas é interessante para ver o que está sendo realizado no banco, principalmente durante testes para identificar possíveis bugs.
 
@@ -395,184 +403,364 @@ app.db = knex(knexfile.test);
     - Deve-se associar o `knex-logger` com o banco de dados da aplicação:
 
         ```
+        const app = require('express')();
+        const knexLogger - require('knex-logger');
+
+        // ...
+
         app.use(knexLogger(app.db));
         ```
 
-- Outra opção é utilizar os logs internos do knex. Porém, nesse caso, é necessário codificar essa função.
+- Outra opção é utilizar os logs internos do knex. Porém, nesse caso, é necessário codificar essas funções.
 
-- Uma função interessante do arquivo de testes é permitir definirmos que um teste deve ser ignorado ou que apenas ele deve ser executado:
+### 7.6. INSERT
 
-    ```
-    test.only('...', () => { ... }); // Apenas ele será executado e os demais ignorados
-    test.skip('...', () => { ... }); // O teste em questão será ignorado
-    ```
-
-- No resultado final, os testes ignorados aparecerão como `skipped`.
-
-### 3.9. Devo separar camada de serviço
-
-- Podemos separar as querys realizadas en outro arquivo, dentro do diretório `src/services`, aumentando a organização do código e permitindo o reuso dessas querys. Assim, quando uma rota quiser realizar uma query, ele apenas chama a mesma através de uma função.
-
-### 3.10-13 Não deve inserir usuário sem nome, email, senha e como email já existente
-
-- Essas validações devem ocorrer na camada de serviços e essa deve devolver um objeto de erro para a rota que a invocou. A rota fica responsável apenas por verificar se houve erro, e caso sim, retorná-lo para o requisitante.
-
-## 4. /accounts
-
-### 4.1. Devo criar a estrutura da tabela de contas
-
-- Para desfazermos uma migration:
+- Para realizar um `INSERT` via knex:
 
     ```
-    node_modules/.bin/knex migrate:rollback --env <environment>
+    const create = async () => {
+        const result = await app.db('users').insert({ name: 'João Pedro Pereira', mail: 'joao@mail.com', passwd: '123456' }, '*');
+        return result;
+    };
     ```
 
-- Digamos que em um cenário hipotético você realiza o *rollback* em três migrations que foram inseridas uma a uma. Se você em seguida executar `migrate:latest`, ele irá refazer as três migrations, na ordem em que elas foram criadas.
-    Agora, se você der um novo *rollback*, as três novamente serão desfeitas, pos o *rollback* não atua apenas em cima da última migration, e sim, no último conjunto de mudanças ocorridas, independentemente dela ter uma ou mais migrations.
-
-### 4.2. Devo inserir uma conta com sucesso
-
-- Não foram realizadas anotações dessa aula.
-
-### 4.3. Deve listar todas as contas
-
-- Não foram realizadas anotações dessa aula.
-
-### 4.4. Deve retornar conta por ID
-
-- Até o momento, criamos uma rota utilizando o `GET` para listar todas as contas da tabela. Para criarmos uma rota utilizando o `GET` para retornar uma única conta através do seu ID, devemos fazer:
+- A operação realizada pela função `create` é equivalente a seguinte query SQL:
 
     ```
-    app.route('/accounts/:id')
+    INSERT INTO users ('name', 'mail', 'passwd')
+    VALUES ('João Pedro Pereira', 'joao@mail.com', '123456')
+    RETURNING *;
     ```
 
-    - Quando inserimos os dois pontos, estamos querendo informar que aquele valor será uma variável;
-    - Assim, para realizar a busca da conta com id 153, devemos fazer:
+
+- Quando o `RETURNING` é configurado, a promise de `INSERT` retorna um array com todos os valores inseridos. Ou seja, é possível inserir mais de uma linha no banco em uma mesma requisição, basta colocá-las dentro de uma lista.
+    - O `RETURNING` não funciona em MySQL;
+    - Se quisermos retornar apenas alguns campos e não todas as colunas do registro inserido, devemos colocar os nomes das colunas desejadas dentro de uma lista.
+
+### 7.7. SELECT
+
+- Para realizar um `SELECT` via knex:
 
     ```
-    localhost:3001/accounts/153
+    const read = async () => {
+        const result = await app.db('users').select(['name', 'mail']).where({ id: 1 });
+        return result;
+    };
     ```
 
-    - Para obter o valor de `id` na execução da função associada a rota, devemos acessar `req.params.id`.
-        - Quando executamos um `POST` para inserir algo no banco, os dados vem em `req.body`;
-        - Quando executamos um `GET` para obter uma linha da tabela, os dados vem em `req.params`.
+- A operação realizada pela função `read` é equivalente a seguinte query SQL:
 
-### 4.5. Deve alterar uma conta
+    ```
+    SELECT name, mail
+    FROM users
+    WHERE id = 1;
+    ```
 
-- Quando realizamos um `PUT` para para alterar algum registro da tabela, devemos inserir o id desse registro na rota (como no caso do `GET` para um único registro), e os valores que devem ser alterados, no `body`.
+### 7.8. UPDATE
 
-```
-request(app)
-    .put(`/accounts/${req.params.id}`).
-    .send(req.body);
+- Para realizar um `UPDATE` via knex:
 
-// req.params.id = 153
-// req.body = { name: 'Acc Updated' }
-```
+    ```
+    const update = async () => {
+        const result = await app.db('users').update({ mail: 'joao.pereira@mail.com' }, ['name', 'mail']).where({ id: 1 });
+        return result;
+    };
+    ```
 
-```
-const update = (id, account) => {
-    return app.db('accounts')
-        .update(account, '*')
-        .where(id);
-};
+- A operação realizada pela função `update` é equivalente a seguinte query SQL:
 
-// account = { name: 'Acc Updated' }
-// id = 153
-```
+    ```
+    UPDATE users
+    SET mail = 'joao.pereira@mail.com'
+    WHERE id = 1
+    RETURNING name, mail;
+    ```
 
-- A operação realizada por `update` é equivalente a:
+### 7.9. DELETE
 
-```
-UPDATE accounts
-SET name = 'Acc Updated'
-WHERE id = 153
-RETURNING *;
-```
+- Para realizar um `DELETE` via knex:
 
-### 4.6. Deve remover uma conta:
-
-- Quando realizamos um `DELETE` para remover algum registro de uma tabela, devemos inserir o `id` desse registro na rota (assim como no caso do `GET` para um único registro e do `PUT`).
-
-```
-request(app)
-    .delete(`/accounts/${req.params.id}`);
-
-// req.params.id = 153
-```
-
-```
-const remove = (id) => {
-    app.db('accounts')
-        .del()
-        .where({ id });
-}
-
-// id = 153
-```
+    ```
+    const delete = async () => {
+        const result = await app.db('users').del().where({ id: 1 });
+        return result;
+    };
+    ```
 
 - A operação realizada por `remove` é equivalente a:
 
-```
-DELETE FROM ACCOUNTS
-WHERE id = 153;
-```
+    ```
+    DELETE FROM users
+    WHERE id = 1;
+    ```
 
-### 4.7. Não deve inserir uma conta sem nome
+### 7.10. JOIN
 
-- Não foram realizadas anotações dessa aula.
+- Para realizar um `JOIN` via knex:
 
-### 4.8. Devo gerenciar os erros
+    ```
+    const readComJoin = async () => {
+        const result = await app.db('accounts').select().join('users', 'users.id', 'accounts.user_id').where({ 'accounts.id': 1 });
+        return result;
+    };
+    ```
 
-- Não foram realizadas anotações dessa aula.
+    - O primeiro parâmetro de `join()` indica com qual tabela será realizada a atividade de agrupamento, o segundo parâmetro diz respeito em qual campo dessa tabela está localizada a chave primária que será utilizada, e o terceiro parâmetro diz respeito ao campo da tabela referenciada em `FROM` que contém a chave estrangeira.
 
-### 4.9. Devo entender os middlewares do Express
+- A operação realizada por `readComJoin` é equivalente a:
 
-- Os middlewares, como já explicado, funcionam como funções intermediárias, executadas antes da função de destino iniciar o processamento da requisição.
+    ```
+    SELECT *
+    FROM accounts
+    JOIN users ON accounts.user_id = users.id
+    WHERE accounts.id = 1
+    ``` 
 
-- O que diferencia um middleware de uma rota comum é que no que a requisição cai para ele, ele a processa e permite que a mesma siga em diante para ser processada por outras funções.
-    - No caso de uma rota comum, no que a requisição caísse nela, nada do que vier após ser executado.
+## 8. Supertest
 
-- A diferença desses middlewares é que além dos atributos `req` e `res`, elas possuem um terceiro atributo: uma função `next()`, que indica que o processamento da requisição deve continuar após ela.
+- A biblioteca `supertest` nos permite testar APIs de forma facilitada.
+
+- Utilizamos o que chamamos de verbos HHTP para fazer as requisições de acordo com a operação que desejamos realizar.
+
+- Existem diversos verbos, mas os quatro mais utilizados que dizem respeito as operações de CRUD (CREATE, READ, UPDATE, DELETE) são:
+
+    | Verbo  | Descrição                |
+    | ------ | ------------------------ |
+    | GET    | Obter dados              |
+    | POST   | Inserir novos dados      |
+    | PUT    | Alterar dados existentes |
+    | DELETE | Remover dados            |
+
+- Podemos haver dois endpoints com o mesmo endereço, desde que utilizem verbos diferentes.
+
+- Toda requisião HTTP retorna uma `Promise`, por isso utilizamos o `then` para ter acesso ao conteúdo da resposta em caso de sucesso.
+
+- Uma request bem sucedida sempre retorna o status **200**.
+
+- O conteúdo esperado pode ser acessado no `body` da resposta.
+
+- Para exemplificar o uso dos verbos, vamos utilizar a tabela `users` utilizada como exemplo durante a apresentação do `Knex`.
+
+### 8.1. POST
+
+- Quando desejamos inserir novos dados na nossa aplicação, realizamos uma requisição *POST* para a nossa API. Nesse caso, devemos indicar os dados que devem ser inseridos no `body` da requisição, utilizando o método `.send()`, que antes de anexar e enviar os dados, os converte para JSON.
+
+    ```
+    test('Deve inserir usuário com sucesso', () => {
+        return request(app).post('/users')
+            .send({ name: 'João Pedro', mail: 'joao@mail.com', passwd: '123456' })
+            .then((res) => {
+                expect(res.status).toBe(200);
+                expect(res.body.name).toBe('João Pedro')
+            });
+    });
+    ```
+
+### 8.2. GET
+
+- O usuário deve ser capaz de fazer um *GET* em `/users` e a aplicação deve retornar uma lista com todos os usuários cadastrados.
+
+    ```
+    test('Deve listar todos os usuários', () => {
+        return request(app).get('/users')
+            .then((res) => {
+                expect(res.status).toBe(200);
+                expect(res.body).toHaveLength(1);
+                expect(res.body[0]).toHaveProperty('name', 'João Pedro');
+            });
+    });
+    ```
+
+- Para acessarmos um único registro, devemos inserir o id do usuário desejado na rota requisitada:
+
+    ```
+    test('Deve listar um único usuário', () => {
+        return request(app).get('/users/1')
+            .then((res) => {
+                expect(res.status).toBe(200);
+                expect(res.body.name).toBe('João Pedro');
+            });
+    });
+    ```
+
+### 8.3. PUT
+
+- Para conseguir editar um usuário armazenado na tabela `users`, devemos enviar uma requisição para a rota `/users` utilizando o verbo `PUT`.
+    - Nesse caso, devemos informar o `id` do usuário em questão na rota (como em `GET` por um único usuário) e os valores que devem ser alterados devem ser enviados através do `send`, como no caso de inserir um novo usuário.
+
+        ```
+        test('Deve alterar um usuário', () => {
+            return request(app).put('/users/1')
+                .send({ mail: 'joao@mail.com' })
+                .then((res) => {
+                    expect(res.status).toBe(200);
+                    expect(res.body.name).toBe('João Pedro')
+                });
+        });
+        ```
+
+### 8.4. DELETE
+
+- A remoção de um usuário segue o mesmo padrão de `PUT`, onde devemos inserir o `id` do usuário que desejamos manipular na chamada da rota.
+    - Nesse caso, como não queremos fazer nenhuma inserção ou edição no usuário, não precisamos enviar nada no `body`.
+
+        ```
+        test('Deve remover um usuário', () => {
+            return request(app).delete('/users/1')
+                .then((res) => {
+                    expect(res.status).toBe(200);
+                });
+        });
+        ```
+
+## 9. Modularização da aplicação com Consign
+
+- O `consign` é uma dependência que facilita a gestão dos módulos de uma aplicação, realizando um *autoload*.
+
+- Na nossa aplicação, utilizamos o `consign` para dividir responsabilidades como as rotas configuradas e os serviços de banco de dados em diferentes arquivos, trazendo maior organização para o código:
+
+    ```
+    consign({ cwd: 'src' }) // Indica o diretório que o consign deve olhar
+        .include('./config/middlewares.js')
+        .into(app);
+    ```
+
+    - No código acima, o `consign` importa o módulo configurado em `middlewares.js`.
+    
+- O módulo deve respeitar o seguinte formato para que o `consign` consiga importá-lo:
+
+    ```
+    module.exports = (app) => {
+        // ...
+    }
+    ```
+
+    - Caso o desejo seja inserir algum atributo ou método em `app`, deve-se colocar um retorno ao final da *arrow function*.
+
+## 10. Desenvolvimento de APIs com Express
+
+- O Express é um framework que permite a construção de servidores web em Node.JS.
+
+- Para criarmos novas rotas, devemos instanciar um objeto `express.Route`
+
+    ```
+    const router = new Router();
+
+    const users = [];
+    ```
+
+### 10.1. Middlewares
+
+- *Middlewares* são funções intermediárias que realizam algum processamento e permitem o prosseguimento da requisição.
+
+- O que diferencia um middleware de uma rota comum é que no que a requisição cai para ele, ele a processa e permite que a mesma siga em diante para ser processada por outras funções. No caso de uma rota comum, no que a requisição caísse nela, nada do que vier após ser executado.
+
+- O `body-parser` é um exemplo, pois ele é executado toda vez que uma requisição do tipo `POST` ou `PUT` é realizada, para converter as informações do body da requisição para o formato esperado pela aplicação;
+
+- Utilizamos o método `app.use()` para extendermos o Express com outros módulos. Essa extensão é feita através da adição de middlewares.
+
+- Outra diferença desses middlewares é que além dos atributos `req` e `res`, elas podem possuir outros dois atributos: um objeto `err` que captura erros lançados pela aplicação e ainda não tratados, além de uma função `next()`, que indica que o processamento da requisição deve continuar após ela.
 
 ```
 app.use((req, res, next) => {
     console.log('Passou por aqui!");
+    const err = new Error();
+    next(err);
 });
+
+app.use((err, req, res, next) => {
+    console.log('Erro tratado!');
+})
 ```
 
-- A ordem de declaração dos middlwares importa.
+- Quando algum parâmetro é passado para `next`, entende-se que houve algum erro durante o processamento e o mesmo é passado adiante para ser tratado por outro middleware.
 
-### 4.10 Devo gerenciar os erros de uma forma genérica
+- A ordem de declaração dos middlewares importa.
 
-- Além do parâmetro `next`, os middlewares também possuem outro parâmetro que é o de erro.
+### 10.2. Body Parser
 
-- Assim, podemos criar uma função genérica que realizar o tratamento necessário dos erros para devolvê-los aos requisitantes.
-
-- A partir de agora, as funções invocadas pelas rotas não serão mais responsáveis por devolver esses erros aos usuários.
-    - Os serviços devem identificá-los esses error e lançá-los através da clásula `throw`;
-    - As funções invocadas pelas rotas identificam que um erro foi lançado, através da cláusula `catch`, que permite que esse erro siga em frente utilizando a função `nex(err)`;
-    - A seguinte função em `app.js` receberá o erro ocorrido, vai identificá-lo e retorná-lo da forma mais adequada:
+- Para conseguir manipular as informações enviadas no `body` em requisições do tipo `POST` e `PUT`, é necessário realizar uma conversão. Para isso, utilizamos o `body-parser`, um módulo utilizado para converter o `body` da requisição para diferentes formatos, entre eles, o JSON.
 
     ```
-    app.use((err, req, res, next) => {
-        const { name, msg, stack } = err;
+    const bodyParser = require('body-parser');
+    app.use(bodyParser.json());
+    ```
 
-        if (name === 'ValidationError') res.status(400).json({ error: msg })
-        else res.status(500).json({ name, msg, stack });
-        next(err);
+- Nesse momento, o Body Parser é um middleware que será executado toda vez que uma requisição com informações no body seja recebida e irá convertê-lo.
+
+### 10.3. POST
+
+- Toda rota desenvolvida possui dois parâmetros: o primeiro é o caminho para acessar aquela funcionalidade e o segundo é o método que determina o que será feito quando o usuário realizar uma requisição.
+    - Esse método possui dois parâmetros: requisição (`req`) e resposta (`res`). Todas as informações enviadas na requisição são acessadas em `req` e tudo o que deve ser retornado para o requisitante é armazenado em `res`;
+    - O método `.json()` converte o valor passado como parâmetro para o formato JSON, o anexa ao  `body` da resposta e envia para o requisitante.
+    - Caso nenhuma informação for retornada no body da resposta, utilizamos o método `.send()`.
+    - Como já explicado, as informações enviadas são acessadas através do body da requisição, logo, estão disponíveis em `req.body`;
+
+        ```
+        router.post('/users', (req, res) => {
+            users.push(req.body)
+            res.status(200).json(req.body);
+        });
+        ```
+
+### 10.4. GET
+
+- Rota para listar todos os usuários cadastrados:
+
+    ```
+    router.get('/users', (req, res) => {
+        res.status(200).json(users);
     });
     ```
 
-- Podemos criar objetos de erro como `ValidationError` para padronizá-los.
+- Até o momento, criamos uma rota utilizando o `GET` para listar todas as contas da tabela. Para criarmos uma rota utilizando o `GET` para retornar uma única conta através do seu ID, devemos fazer:
 
-## 5. /auth
+    ```
+    router.get('/users/:id', (req, res) => {
+        const userId = req.params.id;
+        res.status(200).json(users[userId-1]);
+    });
+    ```
 
-### 5.1. Deve armazenar senha criptografada
+    - Quando inserimos os dois pontos na rota, estamos querendo informar que aquele valor será uma variável;
+
+- Para obter variáveis passadas na rota (como no caso de `id`), devemos acessar `req.params.id`.
+
+### 10.5. PUT
+
+- Rota para alterar um usuário cadastrado:
+
+    ```
+    router.put('/users/:id', (req, res) => {
+        const user = users[req.params.id-1];
+        const newUser = { ...user, ...req.body };
+        
+        users[userId-1] = newUser;
+
+        res.status(200).json(newUser);
+    });
+    ```
+
+### 10.6. DELETE
+
+- Rota para deletar um usuário cadastrado:
+
+    ```
+    router.delete('/users/:id', (req, res) => {
+        const userId = req.params.id;
+        users.splice(userId-1, 1);
+
+        res.status(200).send();
+    });
+    ```
+
+## 11. Autenticação via JWT e Passport
+
+### 11.1. Armazenar senha criptografada
 
 - Um erro muito grave é armazenar as senhas dos usuários no banco de dados de forma crua. Caso alguém consiga acesso a esse banco, terá acesso a conta de todos os usuários do serviço em questão.
 
-- Para corrigir essa questão, podemos utilizar a dependência `bcrypt-nodejs` na versão `0.0.3`.
+- Para corrigir essa questão, podemos utilizar a dependência `bcrypt-nodejs`.
 
 ```
 const salt = bcrypt.genSaltSync(10);
@@ -581,80 +769,37 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 
 - A primeira linha gera um valor de 10 caractéres aleatórios para ser concatenado a senha, assim, o valor do hash gerado sempre seja diferente, mesmo que a senha seja a mesma.
 
-- A senha linha gera o hash utilizando a senha crua e a string aleatória.
+- A segunda linha gera o hash utilizando a senha crua e a string aleatória.
 
-### 5.2. Deve receber token ao logar
+### 11.2. Deve receber token ao logar
 
 - Para o usuário ter acesso as informações que a API fornece, ele deve realizar autenticação na mesma, passando usuário e senha e recebendo de volta um token de acesso.
 
 - Deve ser criada a rota `/auth/signin` que será responsável por realizar essa validação e retornar o token de acesso.
 
-- Utilizamos a dependência `JWT` (JSON Web Token) para gerar o token de autenticação.
+- Utilizamos a dependência `jwt` (JSON Web Token) para gerar o token de autenticação.
 
 - Para gerar o token, o JWT utiliza algumas informações do usuário, além de um segredo, que deve ficar bem escondido no seu programa:
 
-    ```
-    app.services.user.findOne({ mail: req.body.mail })
-        .then((user) => {
-            if (bcrypt.compareSync(req.body.passwd, user.passwd)) {
-                const payload = {
-                    id: user.id,
-                    name: user.name,
-                    mail: user.mail
-                };
+- Esse código está implementado no projeto em `src/routes/auth.js`.
 
-                const token = jwt.encode(payload, secret);
-                res.status(200).json({ token });
-            }
-        }).catch((err) => next(err));
-    ```
+- Para gerar o token, é verificado se o usuário em questão está cadastrado e se a senha é a mesma que a salva no banco no formato de hash, utilizando o método `bcrypt.compareSync()`. Caso as senhas coincidam, um token é gerado, utilizando o método `encode` da dependência `jwt`, junto das informações do usuário e um segredo. Por fim, esse token gerado é retornado.
 
-    - Para gerar o token, é verificado se o usuário em questão está cadastrado e se a senha é a mesma que a salva no banco no formato de hash, utilizando o método `bcrypt.compareSync()`. Caso as senhas coincidam, um token é gerado, utilizando o método `encode` da dependência `jwt`, junto das informações do usuário e um segredo. Por fim, esse token gerado é retornado.
+- Quando houver tentativa de autenticação com um usuário ou senha inválidos, não informar qual deles está errado para não facilitar a vida de possíveis hackers.
 
-    - Quando houver tentativa de autenticação com um usuário ou senha inválidos, não informar qual deles está errado para não facilitar a vida de possíveis hackers.
-
-### 5.3. Não deve autenticar usuário com senha errada
-
-- Não foram realizadas anotações dessa aula.
-
-### 5.4. Não deve acessar uma rota protegida sem token
+### 11.3. Não deve acessar uma rota protegida sem token
 
 - Apesar de já termos autenticado o usuário e senha gerando um token, ainda sim é possível acessar as rotas sem realizar esse procedimento, pois as mesmas encontram-se protegidas.
 
-- Para realizar a autenticação do token, vamos utilizar as seguintes dependências:
-    - `passport@0.4.0`;
-    - `passport-jwt@4.0.0`.
+- Para realizar a autenticação do token, vamos utilizar as dependências `passport` e `passport-jwt`.
+    - O `passport` permite a construção de um middleware para ser responsável pela autenticação de usuários da API;
+    - O `passport-jwt` permite que essa autenticação ocorra utilizando a ideia de JSON Web Tokens.
 
-- O `passport` permite a construção de um middleware para ser responsável pela autenticação de usuários da API.
-
-- O `passport-jwt` permite que essa autenticação ocorra utilizando a ideia de Web Tokens.
+- Esse código está implementado em `src/config/passport.js`.
 
 - Inicialmente, é necessário extrair as funcionalidades que vamos utilizar do `passport-jwt`:
     - `Strategy`: objeto responsável por definir a estratégia de autenticação;
     - `ExtractJwt`: objeto que contém os métodos de obtenção do token da requisição.
-
-```
-const { Strategy, ExtractJwt } = passportJwt;
-```
-
-```
-const params = {
-    secretOrKey: secret // secret = 'Segredo'
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-};
-
-const Strategy = new Strategy(params, (payload, done) => {
-    app.service.user.findOne({ id: payload.id })
-        .then((user) => {
-            if (user) done(null, { ...payload });
-            else done(null, false);
-        }).catch((err) => done(err, false));
-});
-
-passport.use(Strategy);
-
-return { authenticate: () => passport.authenticate('jwt', { session: false }) };
-```
 
 - O parâmetro `params` contém o segredo utilizado para gerar o token de autenticação e o método para obter esse token (no caso, será obtido do header da requisição). Com essas informações, é possível obter os dados do usuário utilizados para gerar o token junto do segredo.
 
@@ -672,23 +817,20 @@ return { authenticate: () => passport.authenticate('jwt', { session: false }) };
 
     ```
     app.route('/users')
-        .all(app.config.passport.authenticate())
-        .get(app.routes.users.findAll)
-        .post(app.routes.users.create)
+        .all(...)
+        .get(...)
+        .post(...)
     ```
 
-- A cláusula `all` exige que qualquer execução daquela rota, seja qual o verbo utilizado, passe por aquele ponto. Em caso de sucesso, a requisição segue seu fluxo natual em direção ao seu processamento.
+- A cláusula `all` exige que qualquer execução daquela rota, seja qual o verbo utilizado, passe por aquele ponto. Em caso de sucesso (nesse caso, usuário validado), a requisição segue seu fluxo natural em direção ao seu processamento.
 
-### 5.5 Deve criar usuário via signup
+### 11.4 Criação de usuário via signup
 
 - A criação de usuário deve ser realizada através da rota `/auth/signup`.
 
-### 5.6. Deve enviar token nos testes
+### 11.5. Enviar token nos testes
 
-- No arquivo de testes, se utilizarmos a diretiva `beforeAll`, podemos determinar instruções que sempre serão executadas antes dos testes.
-    - No contexto do projeto, o `beforeAll` era utilizado para sempre criar um usuário antes dos testes e gerar o token de acesso, para que não seja necessário fazer isso para cada um dos testes, já que todas as rotas agora são protegidas e portanto exigem autenticação.
-
-- Para utilizar os endpoints, agora é necessário realizar a autenticação através do token, e isso é feito utilizando a diretiva `set` após a requisição:
+- Para utilizar os endpoints, agora é necessário realizar a autenticação através do token, e isso é feito utilizando a diretiva `set` do `supertest`, após a requisição:
 
     ```
     const res = await request(app).post('/users')
@@ -696,48 +838,30 @@ return { authenticate: () => passport.authenticate('jwt', { session: false }) };
         .send({ name: 'João', mail: 'joao@mail.com', passwd: '123456' });
     ```
 
-## 6. /accounts #2
+## 12. Arquitetura do Projeto
 
-### 6.1. Devo desacoplar o meu roteamento
+### 12.1. Gerenciamento de erros
 
-- Em situações onde o número de rotas é extenso, pode ser interessante desacoplá-las do arquivo de roteamento. Nesse caso, o arquivo de rotas contém apenas o endereço inicial de cada rota e o arquivo onde elas realmente estão implementadas faz o direcionamento, dado o verbo HTTP utilizado.
+- Assim, podemos criar uma função genérica que realizar o tratamento necessário dos erros para devolvê-los aos requisitantes.
 
-- Exemplo:
+- A partir de agora, as funções invocadas pelas rotas não serão mais responsáveis por devolver esses erros aos usuários.
+    - Os serviços devem identificá-los esses error e lançá-los através da clásula `throw`;
+    - As funções invocadas pelas rotas identificam que um erro foi lançado, através da cláusula `catch`, que permite que esse erro siga em frente utilizando a função `nex(err)`;
+    - A seguinte função em `app.js` receberá o erro ocorrido, vai identificá-lo e retorná-lo da forma mais adequada:
 
-    ```
-    /auth -> No arquivo de configurações de rotas
+        ```
+        app.use((err, req, res, next) => {
+            const { name, msg, stack } = err;
 
-    post /signup post /signin -> No arquivo de implementação de rotas
-    ```
+            if (name === 'ValidationError') res.status(400).json({ error: msg })
+            else res.status(500).json({ name, msg, stack });
+            next(err);
+        });
+        ```
 
-- Assim, nos arquivos onde as rotas são implementadas, instanciamos um objeto `express.Route`, vinculamos as rotas implementadas a ele, e ao ínvés de expormos os métodos no `return`, devolvemos o roteador:
+- Podemos criar objetos de erro como `ValidationError` para padronizá-los.
 
-```
-const express = require ('express');
-
-module.exports = (app) => {
-    const router = new Router();
-
-    // ...
-
-    router.post('/', (req, res, next) => {
-        app.services.account
-            .save({ ...req.body, user_id: req.user.id })
-            .then((result) => res.status(200).json(result[0]))
-            .catch((err) => next(err));
-    });
-
-    // ...
-
-    return router;
-};
-```
-
-- Tanto o método anterior quanto esse são válidos, ver qual deles se encaixa melhor na sua aplicação.
-
-- Esse método também facilita nos casos de lançamento de novas versões, evitando o retrabalho de criar todas as rotas novamente.
-
-### 6.2. Deve listar apenas as contas do usuário
+### 12.2. Um usuário só consegue visualizar suas próprias informações
 
 - Uma coisa que faz sentido é que um usuário consiga manipular apenas suas contas. 
     - Porém, seu `id` não pode ser extraído da requisição enviada, caso contrário, o requisitante pode inserir qualquer `id` no `body` e com isso obter as informações de outro usuário.
@@ -747,105 +871,16 @@ module.exports = (app) => {
 
 - Da forma que foi construído, mesmo que o usuário passe um `id` na requisição, ele é sobrescrito pelo obtido em `req.user.id`.
 
-- Como vimos anteriormente, o `beforeAll` executa um bloco de código antes de iniciar os testes, Porém, ele executa uma única vez para todos os testes.
-    - Podemos utilizar o `beforeEach` para executar esse bloco de código antes de cada teste, gerando um resultado diferente para cada um deles.
-
-### 6.3. Não deve inserir uma conta com nome duplicado
-
-- Não foram realizadas anotações dessa aula.
-
-### 6.4. Não deve retornar uma conta de outro usuário
-
-- Não foram realizadas anotações dessa aula.
-
-### 6.5. Não deve alterar ou remover a conta de outro usuário
-
-- Não foram realizadas anotações dessa aula.
-
-## 7. /transaction
-
-### 7.1. Devo criar a estrutura da tabela de transações
-
-- Não foram realizadas anotações dessa aula.
-
-### 7.2. Deve listar apenas as transações do usuário
-
 - Podemos configurar um middleware que será executado caso a rota da requisição possua determinado parâmetro:
 
-```
-router.param('id', (req, res, next) => {
-    app.services.transaction.find({ 'transactions.id': req.params.id })
-        .then((transaction) => {
-            if (transaction.length > 0 && transaction[0].user_id === req.user.id) next();
-            else throw new RecursoIndevidoError();
-        }).catch((err) => next(err));
-});
-```
+    ```
+    router.param('id', (req, res, next) => {
+        app.services.transaction.find({ 'transactions.id': req.params.id })
+            .then((transaction) => {
+                if (transaction.length > 0 && transaction[0].user_id === req.user.id) next();
+                else throw new RecursoIndevidoError();
+            }).catch((err) => next(err));
+    });
+    ```
 
 - Esse middleware verifica se a rota da requisição envia o atributo `id`, e caso sim, compara o `id` do usuário vinculado a transação com o `id` do usuário autenticado, para evitar que pessoas consigam visualizar dados de outras.
-
-- Para realizar um `JOIN` com o `Knex`:
-
-    ```
-    app.db('transactions')
-        select()
-        .join('accounts', 'accounts.id', 'acc_id')
-        .where(filter);
-
-    // filter = { 'transactions.id': req.params.id }
-    // req.params.id = 153
-    ```
-
-    - O primeiro parâmetro de `join()` indica com qual tarefa será realizada a atividade de agrupamento, o segundo parâmetro diz respeito em qual campo dessa tabela está localizada a chave primária que será utilizada, e o terceiro parâmetro diz respeito ao campo da tabela referenciada em `FROM` que contém a chave estrangeira.
-
-    - Equivalente a:
-
-        ```
-        SELECT *
-        FROM transactions AS t
-        JOIN accounts AS a ON t.acc_id = a.id
-        WHERE t.id = 153
-        ``` 
-
-### 7.3. Devo criar snippets customizados
-
-- Não foram realizadas anotações dessa aula.
-
-### 7.4. Deve inserir uma transação com sucesso
-
-- Não foram realizadas anotações dessa aula.
-
-### 7.5. Deve retornar uma transação por ID
-
-- Não foram realizadas anotações dessa aula.
-
-### 7.6. Deve alterar uma transação
-
-- Não foram realizadas anotações dessa aula.
-
-### 7.7. Deve remover uma transação
-
-- Não foram realizadas anotações dessa aula.
-
-### 7.8. Não deve manipular transação de outro usuário
-
-- Não foram realizadas anotações dessa aula.
-
-### 7.9. Deve ajustar o sinal das transações
-
-- Não foram realizadas anotações dessa aula.
-
-### 7.10. Deve validar a inserção da transação
-
-- Não foram realizadas anotações dessa aula.
-
-### 7.11. Devo aprender a reusar código
-
-- Podemos agregar uma série de testes para que eles sejam ententidos como um único e internamente esses são executados de forma isolada do resto, permitindo questões como reutilização de código (vide uso no script `transaction.test.js`).
-    - Basta utilizarmos o comando `describe`.
-
-### 7.12. Não deve remover uma conta sem transação
-
-- Não foram realizadas anotações dessa aula.
-
-### 7.13. Devo analisar desempenho dos testes
