@@ -6,6 +6,8 @@
 
 [Repositório do Projeto](/)
 
+[Gerador de JWT](https://jwt.io/)
+
 ## 2. API
 
 - APIs (Application Programming Interface) são importantes pois fornecem dados para diferentes sistemas, não ficando restritas a uma linguagem ou natureza da aplicação (web, desktop, mobile, etc.).
@@ -249,15 +251,16 @@
 
     - No resultado final, os testes ignorados aparecerão como `skipped`.
 
-- Com a diretiva `beforeAll`, podemos determinar um bloco de código que será executado uma única vez antes de todos os testes.
+- Com a diretiva `beforeAll`, podemos determinar um bloco de código que será executado antes do início dos testes especificados no arquivo.
     - No contexto do projeto, essa diretiva foi utilizada para sempre criar um único usuário antes dos testes e assim gerar o token de acesso, não sendo necessário criá-los separadamente o que acaba gerando redundância no código.
 
-- Outra opção é a diretiva `beforeEach`, que executa o bloco de código associado antes de cada um dos testes.
+- Outra opção é a diretiva `beforeEach`, que executa o bloco de código associado antes da execução de cada um dos testes especificados no arquivo.
     - No contexto do projeto, essa diretiva foi utilizada para criar um usuário diferente em cada um dos testes para evitar situações de conflito entre testes.
 
 - A diretiva `describe` nos permite agrupar dois ou mais testes para que eles sejam compreendidos pelo JEST como um único.
-    - Incentiva a reutilização de código;
-    - Caso utilizemos diretivas como `beforeAll` ou `beforeEach` dentro desse bloco, eles serão executados apenas para os testes que também encontram-se nesse escopo. 
+    - Incentiva a reutilização de código (vide linha `79` do arquivo `src/test/routes/transaction.test.js`);
+    - Permite o particionamento de um teste mais complexo (vide linha `43` do arquivo `src/test/routes/transfer.test.js`). Caso o modo verboso esteja ativado, será possível visualizar os passos realizados no teste com muita mais clareza do que se ele estive todo concentrado em um único `test`;
+    - Caso utilizemos diretivas como `beforeAll` ou `beforeEach` dentro desse bloco, eles serão executados apenas para os testes que também encontram-se nesse escopo, de forma isolada. 
 
 ### 6.4. Desempenho
 
@@ -275,8 +278,10 @@
 - Para executar o JEST nesse modo:
 
     ```
-    jest --watchAll
+    jest --watchAll --verbose=true
     ```
+
+    - Caso o parâmetro `verbose` seja configurado como `true`, o nome dos testes executados são exibidos na tela, trazendo mais detalhes sobre o que foi realizado.
 
 - Podemos inclusive criar um script para esse comando no `package.json` e chamá-lo de `secure-mode`.
 
@@ -354,14 +359,26 @@
 - Para executar a alteração de uma migration:
 
     ```
-    node_modules/.bin/knex migrate:<nome-arquivo> --env <ambiente>
+    node_modules/.bin/knex migrate:latest --env <ambiente>
     ```
+
+    - Esse comando pode ser realizado direto do arquivo de testes:
+
+        ```
+        app.db.migrate.latest();
+        ```
 
 - Para desfazer uma migration:
 
     ```
     node_modules/.bin/knex migrate:rollback --env <ambiente>
     ```
+
+    - Esse comando pode ser realizado direto do arquivo de testes:
+
+        ```
+        app.db.migrate.roolback();
+        ```
 
     - Digamos que em um cenário hipotético você realiza o *rollback* em três migrations que foram inseridas uma a uma. Se você em seguida executar `migrate:latest`, ele irá refazer as três migrations, na ordem em que elas foram criadas.
         Agora, se você der um novo *rollback*, as três novamente serão desfeitas, pos o *rollback* não atua apenas em cima da última migration, e sim, no último conjunto de mudanças ocorridas, independentemente dela ter uma ou mais migrations.
@@ -388,6 +405,12 @@
     node_modules/.bin/knex seed:run --env <ambiente>
     ```
 
+    - Esse comando pode ser realizado direto do arquivo de testes:
+
+        ```
+        app.db.seed.run();
+        ```
+
 - Tomar cuidado com a questão do ID dos registros incluídos, pois a divisão de responsabilidades entre os testes e a inserção dos dados nas tabelas, não nos permite mais obter esses IDs dinamicamente para manipulá-los nos testes. Portanto, uma alternativa é fixar esse ID na inserção do registro no banco, ao invés de deixar que o postgre faça essa atribuição automaticamente. Algumas possibilidades:
     - Toda vez que for inserir os dados, recriar as tabelas para garantir que os registros sempre vão começar do ID 1;
     - Fixar IDs altos que dificilmente serão alcançados por registros inseridos via teste;
@@ -404,7 +427,7 @@
 
         ```
         const app = require('express')();
-        const knexLogger - require('knex-logger');
+        const knexLogger = require('knex-logger');
 
         // ...
 
