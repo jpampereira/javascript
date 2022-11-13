@@ -861,9 +861,30 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
         .send({ name: 'João', mail: 'joao@mail.com', passwd: '123456' });
     ```
 
-## 12. Arquitetura do Projeto
+## 12. Manipulação de Datas com Moment
 
-### 12.1. Gerenciamento de erros
+- Uma dificuldade comum entre diferentes programadores é a manipulação de datas. Utilizamos a dependência `moment` para facilitar essa atividade.
+
+- Após importar a dependência, podemos armazenar o horário corrente em uma variável da seguinte forma:
+
+    ```
+    const moment = require('moment');
+
+    const current = moment(); // Equivalente a const current = new Date();
+    ```
+
+- Para adicionar ou subtrair dias de uma data:
+
+    ```
+    const past = moment().subtract({ days: 5 });
+    const future = moment().add({ days: 5 });
+    ```
+
+    - Podemos fazer essa adição ou subtração em dias, meses, anos, horas, minutos, segundos, etc.
+
+## 13. Arquitetura do Projeto
+
+### 13.1. Gerenciamento de erros
 
 - Assim, podemos criar uma função genérica que realizar o tratamento necessário dos erros para devolvê-los aos requisitantes.
 
@@ -884,7 +905,7 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 
 - Podemos criar objetos de erro como `ValidationError` para padronizá-los.
 
-### 12.2. Um usuário só consegue visualizar suas próprias informações
+### 13.2. Um usuário só consegue visualizar suas próprias informações
 
 - Uma coisa que faz sentido é que um usuário consiga manipular apenas suas contas. 
     - Porém, seu `id` não pode ser extraído da requisição enviada, caso contrário, o requisitante pode inserir qualquer `id` no `body` e com isso obter as informações de outro usuário.
