@@ -165,26 +165,7 @@
 
 - A extensão **ESLINT** para **Visual Studio Code** facilita o uso do LINT para padronizar o seu código, alertando para possíveis erros de formatação em tempo real, sem a necessidade de se executar um comando toda vez que desejar realizar essa verificação.
 
-
-## 6. Desenvolvimento Orientado à Testes com o JEST
-
-- O JEST permite a criação de scripts para automatização de testes em aplicações Node.JS.
-
-### 6.1. Inicialização
-
-- O arquivo de testes deve ter a extensão `.test.js`.
-
-- No arquivo `eslintrc.json` deve ser informado que estamos utilizando o JEST:
-
-    ```
-    "env": {
-        "jest": true
-    }
-    ```
-
-- Os testes funcionam como documentação da solução. Caso alguém solicite, você pode apresentar os critérios utilizados no desenvolvimento e que os testes passam em todos eles.
-
-### 6.2. Problema do caractére de quebra de linha
+### 5.3. Problema do caractére de quebra de linha
 
 - Por padrão, o `eslint` utiliza o **LF** (*Line Feed*), costumeiramente utilizado em sistemas UNIX, como caractére de quebra de linha, enquanto o Windows utiliza o CRLF (*Carriage Return-Line Feed*). 
 
@@ -206,7 +187,31 @@
 
 - Consultar a documentação para saber como manipular cada uma das regras.
 
-### 6.3. Diretivas
+## 6. Desenvolvimento Orientado à Testes com o JEST
+
+- O JEST permite a criação de scripts para automatização de testes em aplicações Node.JS.
+
+### 6.1. Inicialização
+
+- O arquivo de testes deve ter a extensão `.test.js`.
+
+- No arquivo `eslintrc.json` deve ser informado que estamos utilizando o JEST:
+
+    ```
+    "env": {
+        "jest": true
+    }
+    ```
+
+- Os testes funcionam como documentação da solução. Caso alguém solicite, você pode apresentar os critérios utilizados no desenvolvimento e que os testes passam em todos eles.
+
+- Para executar o JEST:
+
+    ```
+    jest
+    ```
+
+### 6.2. Diretivas
 
 - Formato básico de um teste:
 
@@ -262,13 +267,13 @@
     - Permite o particionamento de um teste mais complexo (vide linha `43` do arquivo `src/test/routes/transfer.test.js`). Caso o modo verboso esteja ativado, será possível visualizar os passos realizados no teste com muita mais clareza do que se ele estive todo concentrado em um único `test`;
     - Caso utilizemos diretivas como `beforeAll` ou `beforeEach` dentro desse bloco, eles serão executados apenas para os testes que também encontram-se nesse escopo, de forma isolada. 
 
-### 6.4. Desempenho
+### 6.3. Desempenho
 
 - Devemos nos atentar a questões de desempenho dos testes. Pode ser que em algumas situações os testes podem demorar mais do que o adequado por realizar diversas operações como interação via HTTP e acesso à bancos de dados.
 
 - Caso o tempo de um teste seja acima do adequado, o tempo desse teste será destacado em vermelho no console, ao final da sua execução.
 
-### 6.5. Modo Seguro
+### 6.4. Modo Seguro
 
 - O modo seguro não é algo nativo e sim uma proposta do autor para tornar o desenvolvimento mais seguro.
 
@@ -278,12 +283,60 @@
 - Para executar o JEST nesse modo:
 
     ```
-    jest --watchAll --verbose=true
+    jest --watchAll --verbose=true --runInBand --forceExit
     ```
 
-    - Caso o parâmetro `verbose` seja configurado como `true`, o nome dos testes executados são exibidos na tela, trazendo mais detalhes sobre o que foi realizado.
+    - Caso o parâmetro `verbose` seja configurado como `true`, o nome dos testes executados são exibidos na tela, trazendo mais detalhes sobre o que foi realizado;
+    - Quando o número de arquivos de testes aumenta, pode ser que alguns cenários acabem interferindo em outros, causando erros não esperados. Para evitar esse problema, adicionamos o parâmetro `--runInBand`, para que os arquivos não sejam executados em paralelo, e sim, sequencialmente;
+    - O parâmetro `--forceExit` é para evitar que o JEST fique preso esperando que todas as Promises sejam retornadas para assim ele finalizar a execução.
 
 - Podemos inclusive criar um script para esse comando no `package.json` e chamá-lo de `secure-mode`.
+
+### 6.5. Cobertura
+
+- É difícil contemplar todos os possíveis cenários de uma aplicação, logo, os testes não garantem que ela está livre de erros e sim que todos os cenários pensados pelo desenvolvedor estão funcionando corretamente.
+
+- A cobertura não serve para garantir que a aplicação não possui erros, e sim para avaliar o quanto do seu código foi testado durante esses cenários mapeados.
+  - Exemplo: Em um `try-catch`, o cenário de sucesso foi obtido durante os testes, porém, o cenário de erro que é coberto pelo `catch` não foi acionado em nenhum momento durante sua execução. A cobertura irá alertar que esse trecho não foi testado, e cabe ao desenvolvedor entender a necessidade de se testar aquele bloco de código ou não. 
+
+- Para adicionar cobertura aos nossos testes:
+
+    ```
+    jest --coverage
+    ```
+
+    - Ao final dos testes, um relatório será impresso no terminal com métricas obtidas dessa análise de cobertura, além da criação de um diretório `coverage`, que permite a visualização desses mesmos dados através do browser com um documento HTML;
+    - Essa cobertura realiza quatro tipos de análises:
+
+        | Nome       | Descrição                                    |
+        | ---------- | -------------------------------------------- |
+        | Statements | % de expressões executadas.                  |
+        | Branches   | % de blocos de códigos `if-else` executados. |
+        | Functions  | % de funções executadas.                     |
+        | Lines      | % de linhas de código executadas.            |
+
+    - Em posse dessas informações, podemos ter noção de trechos de códigos que não foram executados por nenhum dos testes e, se interessante, criar cenários para que eles sejam contemplados.
+
+- Não necessariamente testes que não contemplam 100% de um código são vulneráveis, já que alguns trechos são executados em situações muito específicas que muitas vezes não necessitam de testes. Assim, podemos estabelecer métricas de aceitabilidade quanto a essas porcentagens no arquivo `package.json`:
+
+    ```
+    "jest": {
+        "coverageThreshold": {
+            "global": {
+                "statements": 80,
+                "branches": 80,
+                "functions": 80,
+                "lines": 80
+            },
+            "./src/services": {
+                "lines": 100
+            }
+        }
+    }
+    ```
+
+    - O parâmetro `global` define métricas para a aplicação como um todo. Porém, podemos estabelecer métricas para trechos de forma separada (`./src/services`), quando entendermos que determinados módulos necessitam de maior rigidez quanto a questão de testes.
+    - No exemplo acima, se for identificada uma porcentagem menor do que 80% na cobertura de `statements`, `branches`, `functions` ou `lines`, mesmo que todos os cenários de testes sejam executados com sucesso, o JEST retornará uma mensagem de erro informando que os testes não passaram pela análise de cobertura. 
 
 ## 7. Bancos de Dados em Node.JS com Knex
 
@@ -882,9 +935,28 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 
     - Podemos fazer essa adição ou subtração em dias, meses, anos, horas, minutos, segundos, etc.
 
-## 13. Arquitetura do Projeto
+### 13. Commits mais seguros com Husky
 
-### 13.1. Gerenciamento de erros
+- A dependência `husky` permite definirmos `hooks` que executarão comandos sempre antes de um *commit* para realizar validações. Caso alguma dessas validações retorne alguma inconsistência, o mesmo não é commitado até que o desenvolvedor resolva esses problemas.
+    - Exemplo:
+
+        ```
+        "husky": {
+            "hooks": {
+                "pre-commit": "npm run lint && npm test"
+            }
+        }
+        ```
+
+        - No exemplo acima, caso o `lint` ou os `testes` retornem algum erro, o *commit* não é realizado.
+
+- O Husky possui outras possibilidades descritas em sua documentação.
+
+- Segundo o Wikipédia: *"Em programação de computadores, o termo **hooking** cobre uma série de técnicas utilizadas para modificar ou melhorar o comportamento de um sistema operacional, aplicações ou outros componentes de software através da interceptação de chamadas de funções, mensagens ou eventos passados entre componentes de software."*
+
+## 14. Arquitetura do Projeto
+
+### 14.1. Gerenciamento de erros
 
 - Assim, podemos criar uma função genérica que realizar o tratamento necessário dos erros para devolvê-los aos requisitantes.
 
@@ -905,7 +977,7 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 
 - Podemos criar objetos de erro como `ValidationError` para padronizá-los.
 
-### 13.2. Um usuário só consegue visualizar suas próprias informações
+### 14.2. Um usuário só consegue visualizar suas próprias informações
 
 - Uma coisa que faz sentido é que um usuário consiga manipular apenas suas contas. 
     - Porém, seu `id` não pode ser extraído da requisição enviada, caso contrário, o requisitante pode inserir qualquer `id` no `body` e com isso obter as informações de outro usuário.
