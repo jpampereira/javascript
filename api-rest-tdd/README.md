@@ -28,12 +28,12 @@
     npm init -y
     ```
 
-    | Comando | Descrição                                                                                                                |
-    | ------- | ------------------------------------------------------------------------------------------------------------------------ |
-    | `npm`   | Gerenciador de pacotes do Node (Node Package Manager)                                                                    |
-    | `-y`    | Caso não insira essa *flag*, serão feitas diversas perguntas. Utilizando esse parâmetro, todas são respondidas com *yes* |
+    | Comando | Descrição                                                                                                                 |
+    | ------- | ------------------------------------------------------------------------------------------------------------------------- |
+    | `npm`   | Gerenciador de pacotes do Node (Node Package Manager).                                                                    |
+    | `-y`    | Caso não insira essa *flag*, serão feitas diversas perguntas. Utilizando esse parâmetro, todas são respondidas com *yes*. |
 
-- Inicialmente, serão criados os arquivos `package.json` que armazena informações referentes à aplicação, como nome, versão, descrição, autor, dependências, etc., e o arquivo `package-lock.json`, que traz mais detalhes sobre as dependências da aplicação.
+- Inicialmente, serão criados os arquivos `package.json` que armazena informações referentes à aplicação, como nome, versão, descrição, autor, dependências, etc., e o arquivo `package-lock.json`, que traz mais detalhes sobre essas dependências.
 
 ### 4.2. O arquivo `package.json`
 
@@ -46,6 +46,7 @@
         "description": "",
         "main": "index.js",
         "scripts": {
+            "start": "node index.js",
             "test": "echo \"Error: no test specified\" && exit 1"
         },
         "keywords": [],
@@ -66,18 +67,18 @@
 
 - Descrição dos principais campos desse arquivo:
 
-    | Campo             | Descrição                                                                         |
-    | ----------------- | --------------------------------------------------------------------------------- |
-    | `name`            | Nome da aplicação                                                                 |
-    | `version`         | Versão da aplicação                                                               |
-    | `description`     | Descrição da aplicação                                                            |
-    | `main`            | Arquivo que deve ser executado primeiro quando a aplicação for executada          |
-    | `scripts`         | Podemos criar atalhos para execução de comandos e/ou scripts via linha de comando |
-    | `keywords`        | Palavras-chave relacionadas à aplicação                                           |
-    | `author`          | Autores da aplicação                                                              |
-    | `license`         | Licenças da aplicação                                                             |
-    | `devDependencies` | Dependências em fase desenvolvimento da aplicação                                 |
-    | `dependencies`    | Dependências em fase de produção da aplicação                                     |
+    | Campo             | Descrição                                                                          |
+    | ----------------- | ---------------------------------------------------------------------------------- |
+    | `name`            | Nome da aplicação.                                                                 |
+    | `version`         | Versão da aplicação.                                                               |
+    | `description`     | Descrição da aplicação.                                                            |
+    | `main`            | Arquivo que deve ser executado primeiro quando a aplicação for inicializada.       |
+    | `scripts`         | Lista de alias para execução de comandos e/ou scripts via linha de comando.        |
+    | `keywords`        | Palavras-chave relacionadas à aplicação.                                           |
+    | `author`          | Autores/Desenvolvedores da aplicação.                                              |
+    | `license`         | Licença utilizada pela aplicação.                                                  |
+    | `devDependencies` | Dependências necessárias durante o desenvolvimento.                                |
+    | `dependencies`    | Dependências necessárias em produção.                                              |
 
 ### 4.3. Instalação de Dependências
 
@@ -89,17 +90,21 @@
 
 - Parâmetros que podem ser utilizados junto do comando de instalação:
 
-    | Comando              | Descrição                                                                                                                                                     |
-    | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-    | `i` ou `install`     | Comando para instalação de dependências                                                                                                                       |
-    | `-D` ou `--save-dev` | Indica que a dependência em questão é necessário apenas durante o desenvolvimento da aplicação                                                                |
-    | `-S` ou `--save`     | Indica que a dependência em questão é necessária para o correto funcionamento da aplicação quando disponibilizada em produção                                 |
-    | `-g` ou `--global`   | Indica que a dependência deve ser instalada de forma global, não sendo necessário executar o comando novamente caso a mesma seja utilizada em outros projetos |
-    | `-E`                 | Indica que a dependência instalada deve ser sempre utilizada na versão indicada (provavelmente para evitar problemas de compatibilidade entre versões)        |
+    | Comando              | Descrição                                                                                                                                                                        |
+    | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+    | `i` ou `install`     | Comando para instalação de dependências.                                                                                                                                         |
+    | `-D` ou `--save-dev` | Indica que a dependência em questão é necessária apenas durante o desenvolvimento da aplicação.                                                                                  |
+    | `-S` ou `--save`     | Indica que a dependência em questão é necessária para o correto funcionamento da aplicação quando disponibilizada em produção.                                                   |
+    | `-g` ou `--global`   | Indica que a dependência deve ser instalada de forma global, não sendo necessário executar o comando novamente caso a mesma seja utilizada em outros projetos (não recomendado). |
+    | `-E`                 | Indica que a dependência instalada deve ser sempre utilizada na versão indicada (provavelmente para evitar problemas de compatibilidade entre versões).                          |
 
 - Os arquivos das dependências instaladas ficam no diretório `node_modules`.
 
-- Evite instalar dependências de forma global.
+- Podem ser instaladas diversas dependências ao mesmo tempo:
+
+    ```
+    npm install <nome-dependencia-1> <nome-dependencia-2> ... <nome-dependencia-n>
+    ```
 
 ### 4.4. Versionamento
 
@@ -111,11 +116,11 @@
 
 - Como exemplo, seja `23.6.0` a versão de uma dependência utilizada em nosso projeto. O que cada um desses números indica?
 
-    | Número | Nome             | Descrição                                                                                                   |
-    | ------ | ---------------- | ----------------------------------------------------------------------------------------------------------- |
-    | 23     | Upgrade Major    | Indica que a versão adiciona novas funcionalidades que implicam em problema de compatibilidade              |
-    | 6      | Upgrade Minor    | Indica que a versão adiciona novas funcionalidades, porém, que não implicam em problemas de compatibilidade |
-    | 0      | Upgrade de Patch | Indica que a versão em questão realiza correções de bugs                                                    |
+    | Número | Nome             | Descrição                                                                                                                                |
+    | ------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+    | 23     | Upgrade Major    | A mudança desse número indica que a nova versão adiciona novas funcionalidades que implicam em problema de compatibilidade.              |
+    | 6      | Upgrade Minor    | A mudança desse número indica que a nova versão adiciona novas funcionalidades, porém, que não implicam em problemas de compatibilidade. |
+    | 0      | Upgrade de Patch | A mudança desse número indica que a nova versão em questão realiza correções de bugs.                                                    |
 
 - No arquivo `package.json`, onde são listadas as dependências do projeto, podemos especificar as versões aceitas pelas mesmas
 
@@ -129,7 +134,7 @@
 
 ## 5. ESLINT
 
-- A dependência `eslint` nos ajuda a manter a organização/padronização do código de acordo com as tendências utilizadas no mercado.
+- A dependência `eslint` nos ajuda a manter a organização/padronização do código de acordo com tendências de mercado.
 
 ### 5.1. Inicialização
 
@@ -145,15 +150,15 @@
 ### 5.2. Executando através de scripts
 
 - Como já dito anteriormente, no arquivo `package.json`, podemos criar atalhos para executar determinados scripts e/ou comandos via linha de comando.
-    - No atributo `scripts`, definimos um nome como chave e o valor é o que será executado;
-    - Exemplo:
+    - No atributo `scripts`, definimos um nome como chave e o valor é o comando que de fato será executado. Exemplo:
         
         ```
         "scripts": {
             "lint": "eslint src/** test/** --fix"
         }
         ```
-
+    
+    - No exemplo acima, o lint fará uma verificação em todos os arquivos dos diretórios `src` e `test`;
     - O parâmetro `--fix` permite que o `eslint` faça correções automaticamente quando executado. Porém, não funciona com todo tipo de erro (consultar documentação).
     - Para executar o script do exemplo via linha de comando:
 
@@ -217,11 +222,11 @@
 
     ```
     test('Nome do teste', () => {
-        // Aqui serão feitas as verificações
+        // Aqui serão realizadas as verificações
     });
     ```
 
-- Utilizamos a diretiva `expect`para realizar as verificações:
+- Utilizamos a diretiva `expect` para realizar as verificações:
 
     ```
     test('Verifica número', () => {
@@ -256,11 +261,11 @@
 
     - No resultado final, os testes ignorados aparecerão como `skipped`.
 
-- Com a diretiva `beforeAll`, podemos determinar um bloco de código que será executado antes do início dos testes especificados no arquivo.
+- Com a diretiva `beforeAll`, podemos determinar um bloco de código que será executado uma única vez antes do início dos testes especificados no arquivo.
     - No contexto do projeto, essa diretiva foi utilizada para sempre criar um único usuário antes dos testes e assim gerar o token de acesso, não sendo necessário criá-los separadamente o que acaba gerando redundância no código.
 
 - Outra opção é a diretiva `beforeEach`, que executa o bloco de código associado antes da execução de cada um dos testes especificados no arquivo.
-    - No contexto do projeto, essa diretiva foi utilizada para criar um usuário diferente em cada um dos testes para evitar situações de conflito entre testes.
+    - No contexto do projeto, essa diretiva foi utilizada para criar um usuário diferente em cada um dos testes para evitar situações de conflito entre eles.
 
 - A diretiva `describe` nos permite agrupar dois ou mais testes para que eles sejam compreendidos pelo JEST como um único.
     - Incentiva a reutilização de código (vide linha `79` do arquivo `src/test/routes/transaction.test.js`);
@@ -305,7 +310,7 @@
     jest --coverage
     ```
 
-    - Ao final dos testes, um relatório será impresso no terminal com métricas obtidas dessa análise de cobertura, além da criação de um diretório `coverage`, que permite a visualização desses mesmos dados através do browser com um documento HTML;
+    - Ao final dos testes, um relatório será impresso no terminal com métricas obtidas dessa análise de cobertura, além da criação de um diretório `coverage`, com um documento HTML que permite a visualização desses mesmos dados através do browser;
     - Essa cobertura realiza quatro tipos de análises:
 
         | Nome       | Descrição                                    |
@@ -335,8 +340,8 @@
     }
     ```
 
-    - O parâmetro `global` define métricas para a aplicação como um todo. Porém, podemos estabelecer métricas para trechos de forma separada (`./src/services`), quando entendermos que determinados módulos necessitam de maior rigidez quanto a questão de testes.
-    - No exemplo acima, se for identificada uma porcentagem menor do que 80% na cobertura de `statements`, `branches`, `functions` ou `lines`, mesmo que todos os cenários de testes sejam executados com sucesso, o JEST retornará uma mensagem de erro informando que os testes não passaram pela análise de cobertura. 
+    - O parâmetro `global` define métricas para a aplicação como um todo. Porém, podemos estabelecer métricas para trechos de forma separada (`./src/services`), quando entendermos que determinados módulos necessitam de maior rigidez quanto a questão de cobertura.
+    - No exemplo acima, se for identificada uma porcentagem menor do que 80% na cobertura de `statements`, `branches`, `functions` ou `lines` do código da aplicação como um todo; ou menor do que 100% das `lines` dos arquivos do diretório `src/services`, mesmo que todos os cenários de testes sejam executados com sucesso, o JEST retornará uma mensagem de erro informando que os testes não passaram pela análise de cobertura. 
 
 ## 7. Bancos de Dados em Node.JS com Knex
 
@@ -360,6 +365,8 @@
 
     app.db = knex(knexFile.test);
     ```
+
+    - A partir de então, `app.db` fará referência ao banco de dados da nossa aplicação e será utilizado para realizar todas as manipulações do mesmo.
 
 ### 7.3. Migrations
 
@@ -415,7 +422,7 @@
     node_modules/.bin/knex migrate:latest --env <ambiente>
     ```
 
-    - Esse comando pode ser realizado direto do arquivo de testes:
+    - Esse comando pode ser realizado direto do código JavaScript:
 
         ```
         app.db.migrate.latest();
@@ -427,20 +434,20 @@
     node_modules/.bin/knex migrate:rollback --env <ambiente>
     ```
 
-    - Esse comando pode ser realizado direto do arquivo de testes:
+    - Esse comando pode ser realizado direto do código JavaScript:
 
         ```
         app.db.migrate.roolback();
         ```
 
     - Digamos que em um cenário hipotético você realiza o *rollback* em três migrations que foram inseridas uma a uma. Se você em seguida executar `migrate:latest`, ele irá refazer as três migrations, na ordem em que elas foram criadas.
-        Agora, se você der um novo *rollback*, as três novamente serão desfeitas, pos o *rollback* não atua apenas em cima da última migration, e sim, no último conjunto de mudanças ocorridas, independentemente dela ter uma ou mais migrations.
+        Agora, se você der um novo *rollback*, as três novamente serão desfeitas, pos o *rollback* não atua apenas em cima da última migration, e sim, no último conjunto de mudanças ocorridas, independentemente dela conter uma ou mais migrations.
 
 ### 7.4. Seeds
 
-- Ao longo do curso fizemos a inserção de dados nas tabelas para realização de testes através do JEST, porém, essa técnica, além de mais trabalhosa, acaba poluindo o código.
+- Ao longo do curso fizemos a inserção de dados nas tabelas para realização de testes manualmente através do JEST, porém, essa técnica, além de mais trabalhosa, acaba poluindo o código.
 
-- A inserção de registros em tabelas através de arquivos de `seeds` é uma opção que torna os códigos de teste mais organizados dividindo responsabilidades: arquivos de teste realizam apenas testes, enquanto arquivos de seeds fazem a inserção de registros nas tabelas do banco de dados.
+- A inserção de registros em tabelas através de arquivos de `seeds` é uma opção que torna os códigos de teste mais organizados dividindo responsabilidades: arquivos de teste realizam apenas testes, enquanto arquivos de seeds fazem a inserção de registros nas tabelas do banco de dados para serem utilizados por esses testes.
 
 - Essa funcionalidade não é uma exclusividade do knex e é uma alternativa à criação de scripts SQL ou arquivos XML como utilizado no DBUnit.
 
@@ -458,17 +465,16 @@
     node_modules/.bin/knex seed:run --env <ambiente>
     ```
 
-    - Esse comando pode ser realizado direto do arquivo de testes:
+    - Esse comando pode ser realizado direto no código JavaScript:
 
         ```
         app.db.seed.run();
         ```
 
-- Tomar cuidado com a questão do ID dos registros incluídos, pois a divisão de responsabilidades entre os testes e a inserção dos dados nas tabelas, não nos permite mais obter esses IDs dinamicamente para manipulá-los nos testes. Portanto, uma alternativa é fixar esse ID na inserção do registro no banco, ao invés de deixar que o postgre faça essa atribuição automaticamente. Algumas possibilidades:
+- Tomar cuidado com a questão do ID dos registros incluídos, pois a divisão de responsabilidades entre os testes e a inserção dos dados nas tabelas, não nos permite mais obter esses IDs dinamicamente para manipulá-los nos testes. Portanto, uma alternativa é fixar esse ID na inserção do registro no banco, ao invés de deixar que o banco faça essa atribuição automaticamente. Algumas possibilidades:
     - Toda vez que for inserir os dados, recriar as tabelas para garantir que os registros sempre vão começar do ID 1;
-    - Fixar IDs altos que dificilmente serão alcançados por registros inseridos via teste;
+    - Fixar IDs altos que dificilmente serão alcançados por registros inseridos via teste (recomendado);
     - Usar IDs negativos.
-
 
 ### 7.5. Log de consultas ao banco
 
@@ -532,6 +538,8 @@
     WHERE id = 1;
     ```
 
+- Para retornar todas as colunas dos registros (`SELECT *`) é só não especificar nenhuma coluna dentro de `select()`.
+
 ### 7.8. UPDATE
 
 - Para realizar um `UPDATE` via knex:
@@ -558,7 +566,7 @@
 
     ```
     const delete = async () => {
-        const result = await app.db('users').del().where({ id: 1 });
+        const result = await app.db('users').del().where('id', '=', 1 });
         return result;
     };
     ```
@@ -569,6 +577,8 @@
     DELETE FROM users
     WHERE id = 1;
     ```
+
+- Tanto o formato utilizado dentro de `where()` para modificação quanto remoção de registros são válidos.
 
 ### 7.10. JOIN
 
@@ -596,16 +606,16 @@
 
 - A biblioteca `supertest` nos permite testar APIs de forma facilitada.
 
-- Utilizamos o que chamamos de verbos HHTP para fazer as requisições de acordo com a operação que desejamos realizar.
+- Utilizamos o que chamamos de **verbos HTTP** para fazer as requisições de acordo com a operação que desejamos realizar.
 
 - Existem diversos verbos, mas os quatro mais utilizados que dizem respeito as operações de CRUD (CREATE, READ, UPDATE, DELETE) são:
 
-    | Verbo  | Descrição                |
-    | ------ | ------------------------ |
-    | GET    | Obter dados              |
-    | POST   | Inserir novos dados      |
-    | PUT    | Alterar dados existentes |
-    | DELETE | Remover dados            |
+    | Verbo  | Descrição                      |
+    | ------ | ------------------------------ |
+    | GET    | Obtenção de dados.             |
+    | POST   | Inserção de novos dados.       |
+    | PUT    | Alteração de dados existentes. |
+    | DELETE | Remoção de dados.              |
 
 - Podemos haver dois endpoints com o mesmo endereço, desde que utilizem verbos diferentes.
 
@@ -677,7 +687,7 @@
 
 ### 8.4. DELETE
 
-- A remoção de um usuário segue o mesmo padrão de `PUT`, onde devemos inserir o `id` do usuário que desejamos manipular na chamada da rota.
+- A remoção de um usuário segue o mesmo padrão de `PUT`, onde devemos inserir o `id` do usuário que desejamos manipular no endereço da rota.
     - Nesse caso, como não queremos fazer nenhuma inserção ou edição no usuário, não precisamos enviar nada no `body`.
 
         ```
@@ -691,17 +701,21 @@
 
 ## 9. Modularização da aplicação com Consign
 
-- O `consign` é uma dependência que facilita a gestão dos módulos de uma aplicação, realizando um *autoload*.
+- O `consign` é uma dependência que facilita a gestão dos módulos de uma aplicação através do *autoload*.
 
 - Na nossa aplicação, utilizamos o `consign` para dividir responsabilidades como as rotas configuradas e os serviços de banco de dados em diferentes arquivos, trazendo maior organização para o código:
 
     ```
-    consign({ cwd: 'src' }) // Indica o diretório que o consign deve olhar
-        .include('./config/middlewares.js')
+    consign({ cwd: 'src' }) // Indica o diretório de trabalho do consign
+        .include('./config/passport.js')
+        .then('./config/middlewares.js')
+        .then('./services')
+        .then('./routes')
+        .then('./config/router.js')
         .into(app);
     ```
 
-    - No código acima, o `consign` importa o módulo configurado em `middlewares.js`.
+    - No código acima, o `consign` importa os módulo dos arquivos de middlewares, rotas, serviços e autenticação.
     
 - O módulo deve respeitar o seguinte formato para que o `consign` consiga importá-lo:
 
@@ -729,7 +743,7 @@
 
 - *Middlewares* são funções intermediárias que realizam algum processamento e permitem o prosseguimento da requisição.
 
-- O que diferencia um middleware de uma rota comum é que no que a requisição cai para ele, ele a processa e permite que a mesma siga em diante para ser processada por outras funções. No caso de uma rota comum, no que a requisição caísse nela, nada do que vier após ser executado.
+- O que diferencia um middleware de uma rota comum é que no que a requisição cai para ele, ele a processa e permite que a mesma siga em diante para ser processada por outras funções. No caso de uma rota comum, no que a requisição caísse nela, nada do que vier após é executado.
 
 - O `body-parser` é um exemplo, pois ele é executado toda vez que uma requisição do tipo `POST` ou `PUT` é realizada, para converter as informações do body da requisição para o formato esperado pela aplicação;
 
@@ -755,21 +769,21 @@ app.use((err, req, res, next) => {
 
 ### 10.2. Body Parser
 
-- Para conseguir manipular as informações enviadas no `body` em requisições do tipo `POST` e `PUT`, é necessário realizar uma conversão. Para isso, utilizamos o `body-parser`, um módulo utilizado para converter o `body` da requisição para diferentes formatos, entre eles, o JSON.
+- Para conseguir manipular as informações enviadas no `body` em requisições do tipo `POST` e `PUT`, é necessário realizar uma conversão. Para isso, utilizamos o `body-parser`, uma dependência utilizado para converter o `body` da requisição para diferentes formatos, entre eles, o JSON.
 
     ```
     const bodyParser = require('body-parser');
     app.use(bodyParser.json());
     ```
 
-- Nesse momento, o Body Parser é um middleware que será executado toda vez que uma requisição com informações no body seja recebida e irá convertê-lo.
+- Nesse momento, o Body Parser é um middleware que será executado toda vez que uma requisição com informações no body seja recebida, e irá convertê-la para um formato amigável.
 
 ### 10.3. POST
 
 - Toda rota desenvolvida possui dois parâmetros: o primeiro é o caminho para acessar aquela funcionalidade e o segundo é o método que determina o que será feito quando o usuário realizar uma requisição.
     - Esse método possui dois parâmetros: requisição (`req`) e resposta (`res`). Todas as informações enviadas na requisição são acessadas em `req` e tudo o que deve ser retornado para o requisitante é armazenado em `res`;
     - O método `.json()` converte o valor passado como parâmetro para o formato JSON, o anexa ao  `body` da resposta e envia para o requisitante.
-    - Caso nenhuma informação for retornada no body da resposta, utilizamos o método `.send()`.
+    - Caso nenhuma informação seja retornada no body da resposta, utilizamos o método `.send()`.
     - Como já explicado, as informações enviadas são acessadas através do body da requisição, logo, estão disponíveis em `req.body`;
 
         ```
@@ -839,17 +853,23 @@ app.use((err, req, res, next) => {
 - Para corrigir essa questão, podemos utilizar a dependência `bcrypt-nodejs`.
 
 ```
+const bcrypt = require('bcrypt-nodejs');
+
 const salt = bcrypt.genSaltSync(10);
 const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 ```
 
-- A primeira linha gera um valor de 10 caractéres aleatórios para ser concatenado a senha, assim, o valor do hash gerado sempre seja diferente, mesmo que a senha seja a mesma.
+- A terceira linha gera um valor de 10 caractéres aleatórios para ser concatenado a senha, assim, o valor do hash gerado sempre seja diferente, mesmo que a senha seja a mesma.
 
-- A segunda linha gera o hash utilizando a senha crua e a string aleatória.
+- A quarta linha gera o hash, utilizando a senha crua e a string aleatória, que será armazenado no banco no lugar da senha crua.
 
-### 11.2. Deve receber token ao logar
+### 11.2 Criação de usuário via signup
 
-- Para o usuário ter acesso as informações que a API fornece, ele deve realizar autenticação na mesma, passando usuário e senha e recebendo de volta um token de acesso.
+- A criação de usuário deve ser realizada através da rota `/auth/signup`.
+
+### 11.3. Deve receber token ao logar
+
+- Para o usuário ter acesso as informações que a API fornece, ele deve realizar autenticação na mesma, passando usuário e senha, criados em `/auth/signup` e recebendo de volta um token de acesso.
 
 - Deve ser criada a rota `/auth/signin` que será responsável por realizar essa validação e retornar o token de acesso.
 
@@ -863,7 +883,7 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 
 - Quando houver tentativa de autenticação com um usuário ou senha inválidos, não informar qual deles está errado para não facilitar a vida de possíveis hackers.
 
-### 11.3. Não deve acessar uma rota protegida sem token
+### 11.4. Não deve acessar uma rota protegida sem token
 
 - Apesar de já termos autenticado o usuário e senha gerando um token, ainda sim é possível acessar as rotas sem realizar esse procedimento, pois as mesmas encontram-se protegidas.
 
@@ -887,7 +907,7 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 
 - Essa estratégia é vinculada ao `passport`.
 
-- E o método de autenticação é exportado como módulo.
+- E o método de autenticação é exportado pelo módulo.
 
 - Essa autenticação deve ser realizada antes de qualquer método de qualquer rota:
 
@@ -898,11 +918,7 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
         .post(...)
     ```
 
-- A cláusula `all` exige que qualquer execução daquela rota, seja qual o verbo utilizado, passe por aquele ponto. Em caso de sucesso (nesse caso, usuário validado), a requisição segue seu fluxo natural em direção ao seu processamento.
-
-### 11.4 Criação de usuário via signup
-
-- A criação de usuário deve ser realizada através da rota `/auth/signup`.
+- A cláusula `all` exige que qualquer execução daquela rota, seja qual o verbo utilizado, passe por aquele ponto. Em caso de sucesso (nesse caso, usuário validado), a requisição segue seu fluxo natural, em direção ao verbo solicitado.
 
 ### 11.5. Enviar token nos testes
 
@@ -935,7 +951,7 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 
     - Podemos fazer essa adição ou subtração em dias, meses, anos, horas, minutos, segundos, etc.
 
-### 13. Commits mais seguros com Husky
+## 13. Commits mais seguros com Husky
 
 - A dependência `husky` permite definirmos `hooks` que executarão comandos sempre antes de um *commit* para realizar validações. Caso alguma dessas validações retorne alguma inconsistência, o mesmo não é commitado até que o desenvolvedor resolva esses problemas.
     - Exemplo:
