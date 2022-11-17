@@ -67,18 +67,18 @@
 
 - Descrição dos principais campos desse arquivo:
 
-    | Campo             | Descrição                                                                          |
-    | ----------------- | ---------------------------------------------------------------------------------- |
-    | `name`            | Nome da aplicação.                                                                 |
-    | `version`         | Versão da aplicação.                                                               |
-    | `description`     | Descrição da aplicação.                                                            |
-    | `main`            | Arquivo que deve ser executado primeiro quando a aplicação for inicializada.       |
-    | `scripts`         | Lista de alias para execução de comandos e/ou scripts via linha de comando.        |
-    | `keywords`        | Palavras-chave relacionadas à aplicação.                                           |
-    | `author`          | Autores/Desenvolvedores da aplicação.                                              |
-    | `license`         | Licença utilizada pela aplicação.                                                  |
-    | `devDependencies` | Dependências necessárias durante o desenvolvimento.                                |
-    | `dependencies`    | Dependências necessárias em produção.                                              |
+    | Campo             | Descrição                                                                    |
+    | ----------------- | ---------------------------------------------------------------------------- |
+    | `name`            | Nome da aplicação.                                                           |
+    | `version`         | Versão da aplicação.                                                         |
+    | `description`     | Descrição da aplicação.                                                      |
+    | `main`            | Arquivo que deve ser executado primeiro quando a aplicação for inicializada. |
+    | `scripts`         | Lista de alias para execução de comandos e/ou scripts via linha de comando.  |
+    | `keywords`        | Palavras-chave relacionadas à aplicação.                                     |
+    | `author`          | Autores/Desenvolvedores da aplicação.                                        |
+    | `license`         | Licença utilizada pela aplicação.                                            |
+    | `devDependencies` | Dependências necessárias durante o desenvolvimento.                          |
+    | `dependencies`    | Dependências necessárias em produção.                                        |
 
 ### 4.3. Instalação de Dependências
 
@@ -132,7 +132,7 @@
     }
     ```
 
-## 5. ESLINT
+## 5. Padronização de código com LINT
 
 - A dependência `eslint` nos ajuda a manter a organização/padronização do código de acordo com tendências de mercado.
 
@@ -192,7 +192,7 @@
 
 - Consultar a documentação para saber como manipular cada uma das regras.
 
-## 6. Desenvolvimento Orientado à Testes com o JEST
+## 6. Desenvolvimento Orientado à Testes com JEST
 
 - O JEST permite a criação de scripts para automatização de testes em aplicações Node.JS.
 
@@ -268,8 +268,8 @@
     - No contexto do projeto, essa diretiva foi utilizada para criar um usuário diferente em cada um dos testes para evitar situações de conflito entre eles.
 
 - A diretiva `describe` nos permite agrupar dois ou mais testes para que eles sejam compreendidos pelo JEST como um único.
-    - Incentiva a reutilização de código (vide linha `79` do arquivo `src/test/routes/transaction.test.js`);
-    - Permite o particionamento de um teste mais complexo (vide linha `43` do arquivo `src/test/routes/transfer.test.js`). Caso o modo verboso esteja ativado, será possível visualizar os passos realizados no teste com muita mais clareza do que se ele estive todo concentrado em um único `test`;
+    - Incentiva a reutilização de código (vide `src/test/routes/transaction.test.js:79`);
+    - Permite o particionamento de um teste mais complexo (vide `src/test/routes/transfer.test.js:43`). Caso o modo verboso esteja ativado, será possível visualizar os passos realizados no teste com muita mais clareza do que se ele estive todo concentrado em um único `test`;
     - Caso utilizemos diretivas como `beforeAll` ou `beforeEach` dentro desse bloco, eles serão executados apenas para os testes que também encontram-se nesse escopo, de forma isolada. 
 
 ### 6.3. Desempenho
@@ -602,7 +602,7 @@
     WHERE accounts.id = 1
     ``` 
 
-## 8. Supertest
+## 8. Requisições HTTP com Supertest
 
 - A biblioteca `supertest` nos permite testar APIs de forma facilitada.
 
@@ -970,30 +970,76 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 
 - Segundo o Wikipédia: *"Em programação de computadores, o termo **hooking** cobre uma série de técnicas utilizadas para modificar ou melhorar o comportamento de um sistema operacional, aplicações ou outros componentes de software através da interceptação de chamadas de funções, mensagens ou eventos passados entre componentes de software."*
 
-## 14. Arquitetura do Projeto
+## 14. Chaveamento de contexto utilizando variáveis de ambiente
 
-### 14.1. Gerenciamento de erros
+- Uma prática comum do Express é utilizar variáveis de ambiente do Sistema Operacional para determinar se a aplicação em questão deve ser executada em contexto de **testes** ou **produção**.
+  - Essa prática é interessante em casos onde a aplicação precisa definir para qual banco de dados ela deve olhar (vide `src/app.js:9`).
 
-- Assim, podemos criar uma função genérica que realizar o tratamento necessário dos erros para devolvê-los aos requisitantes.
+- O padrão do Express é utilizar a variável de ambiente `NODE_ENV` para determinar o contexto de execução.
+  - **Obs.:** Até o momento não consegui entender porque utilizar essa variável gera saídas de erro durante os testes, portanto, estou utilizando a variável `SEUBARRIGA_ENV`.
 
-- A partir de agora, as funções invocadas pelas rotas não serão mais responsáveis por devolver esses erros aos usuários.
-    - Os serviços devem identificá-los esses error e lançá-los através da clásula `throw`;
-    - As funções invocadas pelas rotas identificam que um erro foi lançado, através da cláusula `catch`, que permite que esse erro siga em frente utilizando a função `nex(err)`;
-    - A seguinte função em `app.js` receberá o erro ocorrido, vai identificá-lo e retorná-lo da forma mais adequada:
+- Para criar uma variável de ambiente no Windows:
+
+    ```
+    set NOME_VARIAVEL=valor
+    ```
+
+- Para acessar a variável de ambiente pelo Node.JS:
+
+    ```
+    console.log(process.env.NOME_VARIAVEL);
+    ```
+
+- O valor da variável de ambiente pode ser definida nos scripts de `package.json`:
+
+    ```
+    "scripts": {
+        "start": "set NODE_ENV=production && node src/server.js",
+        "test": "set NODE_ENV=development && jest --coverage --runInBand --forceExit"
+    },
+    ```
+
+    - **Obs.:** Tomar cuidado que o espaço entre o valor da variável de ambiente e o operador de concatenação de comandos do Windows (`&&`) é entendido como parte da variável de ambiente. Das duas umas: remover esse espaço ou realizar um `.trim()` quando a variável for capturada pelo Node.JS:
 
         ```
-        app.use((err, req, res, next) => {
-            const { name, msg, stack } = err;
-
-            if (name === 'ValidationError') res.status(400).json({ error: msg })
-            else res.status(500).json({ name, msg, stack });
-            next(err);
-        });
+        "scripts": {
+            "start": "set NODE_ENV=production&& node src/server.js",
+            "test": "set NODE_ENV=development&& jest --coverage --runInBand --forceExit"
+        },
         ```
 
-- Podemos criar objetos de erro como `ValidationError` para padronizá-los.
+        ou
 
-### 14.2. Um usuário só consegue visualizar suas próprias informações
+        ```
+        console.log(process.env.NOME_VARIAVEL.trim());
+        ```
+
+## 15. Segurança nos logs com Winston e UUID
+
+- Um erro de segurança grave é expormos para os usuários as mensagens de erro geradas pelas exceções das nossa aplicação, pois essas podem conter informações relacionadas a arquitetura, como por exemplo, a modelagem do seu banco de dados.
+  - Essas informações podem ser utilizadas posteriormente por hackers para atacar o sistema com maior facilidade, já que eles sabem como a aplicação funciona.
+
+- Uma alternativa é omití-las do usuário e retornar apenas um ID que pode ser utilizado para consultar um arquivo de log, onde de fato as informações relacionadas a esse erro estarão armazenadas.
+
+### 15.1. Winston
+
+- O `winston` é uma dependência que procura facilitar a tarefa de logging, importante principalmente nos casos de disponibilização de informações de erros ocorridos na aplicação.
+
+- Ele permite definirmos `levels` de criticidade para as informações, e direcioná-las para um determinado tipo de output dependendo do seu nível, como por exemplo, o terminal ou um arquivo de logs. Cada uma dessas possibilidades é um `transport`.
+
+### 15.2. UUID
+
+- Segundo o Wikipédia: *Um identificador único universal (do inglês universally unique identifier - **UUID**) é um número de 128 bits usado para identificar informações em sistemas de computação. O termo identificador único global (globally unique identifier - **GUID**) também é utilizado.*
+
+- Utilizando a dependência `uuidv4`, podemos gerar esse identificador único que será gerado para cada erro capturado pela aplicação, e irá retorná-lo para o requisitante.
+
+- Esse UUID pode ser utilizado para fazer uma busca no arquivo de logs de erros da aplicação para obter mais detalhes sobre o ocorrido.
+
+## 16. Questões de implementação do projeto
+
+### 16.1. Divisão de responsabilidades
+
+### 16.2. Um usuário só consegue visualizar suas próprias informações
 
 - Uma coisa que faz sentido é que um usuário consiga manipular apenas suas contas. 
     - Porém, seu `id` não pode ser extraído da requisição enviada, caso contrário, o requisitante pode inserir qualquer `id` no `body` e com isso obter as informações de outro usuário.
@@ -1016,3 +1062,24 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
     ```
 
 - Esse middleware verifica se a rota da requisição envia o atributo `id`, e caso sim, compara o `id` do usuário vinculado a transação com o `id` do usuário autenticado, para evitar que pessoas consigam visualizar dados de outras.
+
+### 16.3. Gerenciamento de erros
+
+- Assim, podemos criar uma função genérica que realizar o tratamento necessário dos erros para devolvê-los aos requisitantes.
+
+- A partir de agora, as funções invocadas pelas rotas não serão mais responsáveis por devolver esses erros aos usuários.
+    - Os serviços devem identificá-los esses error e lançá-los através da clásula `throw`;
+    - As funções invocadas pelas rotas identificam que um erro foi lançado, através da cláusula `catch`, que permite que esse erro siga em frente utilizando a função `nex(err)`;
+    - A seguinte função em `app.js` receberá o erro ocorrido, vai identificá-lo e retorná-lo da forma mais adequada:
+
+        ```
+        app.use((err, req, res, next) => {
+            const { name, msg, stack } = err;
+
+            if (name === 'ValidationError') res.status(400).json({ error: msg })
+            else res.status(500).json({ name, msg, stack });
+            next(err);
+        });
+        ```
+
+- Podemos criar objetos de erro como `ValidationError` para padronizá-los.
