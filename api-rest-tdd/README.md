@@ -10,13 +10,15 @@
 
 ## 2. API
 
-- APIs (Application Programming Interface) são importantes pois fornecem dados para diferentes sistemas, não ficando restritas a uma linguagem ou natureza da aplicação (web, desktop, mobile, etc.).
+- APIs (Application Programming Interface) são importantes pois fornecem dados para diferentes sistemas, não ficando restritas a uma linguagem de programação ou a natureza da aplicação (web, desktop, mobile, etc.).
 
 ## 3. TEST DRIVEN DEVELOPMENT (TDD)
 
 - Em português, **Desenvolvimento guiado por testes**.
 
 - Os testes são de extrema importância para garantir a segurança e confiabilidade da nossa aplicação.
+
+- O TDD é uma prática de desenvolvimento onde, primeiramente, os cenários de teste unitários são mapeados e escritos e só depois há o desenvolvimento do código da aplicação, afim de satisfazer esses testes.
 
 ## 4. Projeto Node.JS
 
@@ -98,13 +100,21 @@
     | `-g` ou `--global`   | Indica que a dependência deve ser instalada de forma global, não sendo necessário executar o comando novamente caso a mesma seja utilizada em outros projetos (não recomendado). |
     | `-E`                 | Indica que a dependência instalada deve ser sempre utilizada na versão indicada (provavelmente para evitar problemas de compatibilidade entre versões).                          |
 
-- Os arquivos das dependências instaladas ficam no diretório `node_modules`.
-
 - Podem ser instaladas diversas dependências ao mesmo tempo:
 
     ```
     npm install <nome-dependencia-1> <nome-dependencia-2> ... <nome-dependencia-n>
     ```
+
+- Os arquivos das dependências instaladas ficam no diretório `node_modules`.
+  - Uma boa prática é utilizarmos um arquivo `.gitignore` para indicar que esse diretório não precisa ser versionado pelo Git;
+  - Como já explicado, as dependências necessárias para o correto funcionamento da aplicação são descritas na seção `dependencies` de `package.json`. Assim, caso o código da aplicação seja baixado em outra máquina sem as dependências em questão, para instalá-las, é necessário apenas realizar o seguinte comando:
+    
+    ```
+    npm install
+    ```
+
+  - Nesse momento, todas as dependências descritas no arquivo `package.json` serão instaladas.
 
 ### 4.4. Versionamento
 
@@ -114,13 +124,13 @@
     npm install <nome-dependencia>@<versao>
     ```
 
-- Como exemplo, seja `23.6.0` a versão de uma dependência utilizada em nosso projeto. O que cada um desses números indica?
+- Como exemplo, seja `23.6.0` a versão de uma dependência utilizada em nosso projeto. O que cada um desses números significa?
 
-    | Número | Nome             | Descrição                                                                                                                                |
-    | ------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-    | 23     | Upgrade Major    | A mudança desse número indica que a nova versão adiciona novas funcionalidades que implicam em problema de compatibilidade.              |
-    | 6      | Upgrade Minor    | A mudança desse número indica que a nova versão adiciona novas funcionalidades, porém, que não implicam em problemas de compatibilidade. |
-    | 0      | Upgrade de Patch | A mudança desse número indica que a nova versão em questão realiza correções de bugs.                                                    |
+    | Número | Nome                 | Descrição                                                                                                                                |
+    | ------ | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+    | 23     | Upgrade Major        | A mudança desse número indica que a nova versão adiciona novas funcionalidades que implicam em problema de compatibilidade.              |
+    | 6      | Upgrade Minor        | A mudança desse número indica que a nova versão adiciona novas funcionalidades, porém, que não implicam em problemas de compatibilidade. |
+    | 0      | Upgrade de Patch/Fix | A mudança desse número indica que a nova versão em questão realiza correções de bugs.                                                    |
 
 - No arquivo `package.json`, onde são listadas as dependências do projeto, podemos especificar as versões aceitas pelas mesmas
 
@@ -168,6 +178,8 @@
 
 - Algumas palavras como `start` e `test` já são reconhecidas pelo Node, portante, não necessitam do comando `run`.
 
+- Se a dependência estiver instalada de forma local e esteja sendo executada via linha de comando, é necessário passar todo o caminho `node_modules/.bin/...`. Caso ela esteja instalada de forma global ou estiver sendo executada através de um `script` em `package.json`, então esse caminho se faz desnecessário.
+
 - A extensão **ESLINT** para **Visual Studio Code** facilita o uso do LINT para padronizar o seu código, alertando para possíveis erros de formatação em tempo real, sem a necessidade de se executar um comando toda vez que desejar realizar essa verificação.
 
 ### 5.3. Problema do caractére de quebra de linha
@@ -213,7 +225,7 @@
 - Para executar o JEST:
 
     ```
-    jest
+    ./node_modules/.bin/jest
     ```
 
 ### 6.2. Diretivas
@@ -232,7 +244,7 @@
     test('Verifica número', () => {
         const num = 10;
 
-        expect(num).toBeNull();
+        expect(num).not.toBeNull();
         expect(num).toBe(10);
         expect(num).toBeGreaterThan(9);
         expect(num).toBeLessThan(11);
@@ -244,7 +256,7 @@
         ];
 
         expect(arr).toHaveLength(1);
-        expect(aar[0]).toHaveProperty('name', 'João Pedro');
+        expect(arr[0]).toHaveProperty('name', 'João Pedro');
     });
     ```
 
@@ -252,11 +264,18 @@
         - Se passado um parâmetro, é verificado se o objeto possui aquele atributo;
         - Se passado dois parâmetros, é verificado se o objeto possui algum atributo com o nome passado no primeiro parâmetro e se o mesmo possui como valor o passado no segundo parâmetro.
 
-- Uma função interessante do arquivo de testes é permitir definirmos que um teste deve ser ignorado ou que apenas ele deve ser executado:
+- Uma função interessante do arquivo de testes é definirmos que um teste deve ser ignorado ou que apenas ele deve ser executado:
 
     ```
-    test.only('...', () => { ... }); // Apenas ele será executado e os demais ignorados
-    test.skip('...', () => { ... }); // O teste em questão será ignorado
+    test.only('Apenas esse teste será executado e os demais ignorados', () => {
+        // ...
+    });
+    ```
+
+    ```
+    test.skip('Esse teste será ignorado', () => {
+        // ...
+    });
     ```
 
     - No resultado final, os testes ignorados aparecerão como `skipped`.
@@ -310,7 +329,7 @@
     jest --coverage
     ```
 
-    - Ao final dos testes, um relatório será impresso no terminal com métricas obtidas dessa análise de cobertura, além da criação de um diretório `coverage`, com um documento HTML que permite a visualização desses mesmos dados através do browser;
+    - Ao final dos testes, um relatório será impresso no terminal com métricas obtidas dessa análise de cobertura, além da criação de um diretório `coverage`, contendo um documento HTML que permite a visualização desses mesmos dados através do browser;
     - Essa cobertura realiza quatro tipos de análises:
 
         | Nome       | Descrição                                    |
@@ -715,7 +734,7 @@
         .into(app);
     ```
 
-    - No código acima, o `consign` importa os módulo dos arquivos de middlewares, rotas, serviços e autenticação.
+    - No código acima, o `consign` importa para a aplicação, em Express, os módulo de middlewares, rotas, serviços e autenticação.
     
 - O módulo deve respeitar o seguinte formato para que o `consign` consiga importá-lo:
 
@@ -731,52 +750,77 @@
 
 - O Express é um framework que permite a construção de servidores web em Node.JS.
 
-- Para criarmos novas rotas, devemos instanciar um objeto `express.Route`
+- Para iniciar o Express:
+
+    ```
+    const express = require('express');
+    const app = express();
+    ```
+
+- Para criarmos uma nova rota, devemos instanciar um objeto `express.Route`
 
     ```
     const router = new Router();
-
-    const users = [];
     ```
 
 ### 10.1. Middlewares
 
-- *Middlewares* são funções intermediárias que realizam algum processamento e permitem o prosseguimento da requisição.
+- Os *Middlewares* são um padrão de projeto que utiliza funções de forma sequencial, formando uma cadeia de responsabilidades (*chain of responsabilities*).
+
+- O Express utiliza os *Middlewares* como funções intermediárias que realizam algum processamento e permitem o prosseguimento da requisição.
 
 - O que diferencia um middleware de uma rota comum é que no que a requisição cai para ele, ele a processa e permite que a mesma siga em diante para ser processada por outras funções. No caso de uma rota comum, no que a requisição caísse nela, nada do que vier após é executado.
 
-- O `body-parser` é um exemplo, pois ele é executado toda vez que uma requisição do tipo `POST` ou `PUT` é realizada, para converter as informações do body da requisição para o formato esperado pela aplicação;
+- Exemplos de Middlewares utilizados pelo Express:
+  - O `body-parser` é executado toda vez que uma requisição é realizada, para converter as informações do body para o formato esperado pela aplicação (importante principalmente em requisições do tipo `POST` e `PUT` que enviam os dados pelo *body*);
+  - O `cors` é executado toda vez que há uma requisição, para verificar se a origem do destinatário pode ter acesso aos recursos daquele serviço web;
+  - Na aplicação desenvolvida, realizamos a autenticação do usuário através de um *Middleware*. 
 
-- Utilizamos o método `app.use()` para extendermos o Express com outros módulos. Essa extensão é feita através da adição de middlewares.
+- Utilizamos o método `app.use()` para extender a aplicação com esses *Middlewares*.
 
-- Outra diferença desses middlewares é que além dos atributos `req` e `res`, elas podem possuir outros dois atributos: um objeto `err` que captura erros lançados pela aplicação e ainda não tratados, além de uma função `next()`, que indica que o processamento da requisição deve continuar após ela.
+- Outra diferença desses middlewares é que além dos atributos `req` e `res`, elas podem possuir outros dois atributos: um objeto `err` que captura erros lançados pela aplicação e ainda não tratados, além de uma função `next`, que indica que o processamento da requisição deve continuar após ela.
 
-```
-app.use((req, res, next) => {
-    console.log('Passou por aqui!");
-    const err = new Error();
-    next(err);
-});
+    ```
+    app.use((req, res, next) => {
+        console.log('Passou por aqui!");
+        const err = new Error();
+        next(err);
+    });
 
-app.use((err, req, res, next) => {
-    console.log('Erro tratado!');
-})
-```
+    app.use((err, req, res, next) => {
+        console.log('Erro tratado!');
+    })
+    ```
 
 - Quando algum parâmetro é passado para `next`, entende-se que houve algum erro durante o processamento e o mesmo é passado adiante para ser tratado por outro middleware.
 
 - A ordem de declaração dos middlewares importa.
 
+- Em um único `app.use()` podemos adicionar diversos middlewares:
+
+    ```
+    function mid1() { }
+    function mid2() { }
+    function mid3() { }
+
+    app.use(mid1, mid2, mid3);
+    ```
+
+    - Na aplicação desenvolvida, essa técnica era utilizada para inserir métodos de autenticação e validação antes da execução de rotas.
+
 ### 10.2. Body Parser
 
-- Para conseguir manipular as informações enviadas no `body` em requisições do tipo `POST` e `PUT`, é necessário realizar uma conversão. Para isso, utilizamos o `body-parser`, uma dependência utilizado para converter o `body` da requisição para diferentes formatos, entre eles, o JSON.
+- Para manipularmos as informações enviadas no `body` em requisições do tipo `POST` e `PUT` com  maior facilidade, é necessário realizar uma conversão. Para isso, utilizamos o `body-parser`, uma dependência utilizado para interpretar o `body` da requisição em diferentes formatos, entre eles, o JSON.
 
     ```
     const bodyParser = require('body-parser');
-    app.use(bodyParser.json());
+
+    app.use(bodyParser.text()); // Interpreta o body como texto
+    app.use(bodyParser.json()); // Interpreta o body como JSON
+    app.use(bodyParser.urlencoded({ extended: true })); // Interpreta o body como URL encoded - Padrão de submissão de formulários
     ```
 
-- Nesse momento, o Body Parser é um middleware que será executado toda vez que uma requisição com informações no body seja recebida, e irá convertê-la para um formato amigável.
+- Nesse momento, o body-parser é um *Middleware* que será executado toda vez que uma requisição for interceptada, e irá convertê-la para o formato esperado.
 
 ### 10.3. POST
 
@@ -784,9 +828,11 @@ app.use((err, req, res, next) => {
     - Esse método possui dois parâmetros: requisição (`req`) e resposta (`res`). Todas as informações enviadas na requisição são acessadas em `req` e tudo o que deve ser retornado para o requisitante é armazenado em `res`;
     - O método `.json()` converte o valor passado como parâmetro para o formato JSON, o anexa ao  `body` da resposta e envia para o requisitante.
     - Caso nenhuma informação seja retornada no body da resposta, utilizamos o método `.send()`.
-    - Como já explicado, as informações enviadas são acessadas através do body da requisição, logo, estão disponíveis em `req.body`;
+    - Como já explicado, em requisições do tipo `POST`, as informações enviadas são acessadas através do body e podem ser acessadas em `req.body`;
 
         ```
+        const users = [];
+
         router.post('/users', (req, res) => {
             users.push(req.body)
             res.status(200).json(req.body);
@@ -812,9 +858,24 @@ app.use((err, req, res, next) => {
     });
     ```
 
-    - Quando inserimos os dois pontos na rota, estamos querendo informar que aquele valor será uma variável;
+    - Quando inserimos os dois pontos na rota, estamos querendo informar que aquele valor será um parâmetro variável passado pelo requisitante;
+    - Para obter variáveis passadas na rota, devemos acessar `req.params`.
 
-- Para obter variáveis passadas na rota (como no caso de `id`), devemos acessar `req.params.id`.
+- Existe outra forma de passar os parâmetros em uma requisição do tipo `GET` onde utilizamos as *querys strings*:
+    - Exemplo de URL: `http://localhost:3001?id=1`;
+    - O caractere `?` separa a URL dos parâmetros, que devem respeitar o formato `chave=valor` e podem ser múltiplos, sendo separados por `&&`;
+    - Esses parâmetros ficam disponíveis em `req.query`:
+
+        ```
+        router.get('/users', (req, res) => {
+            if (req.query.id !== undefined) {
+                const userId = req.query.id;
+                res.status(200).json(users[userId-1]);
+            } else {
+                res.status(200).json(users);
+            }
+        });
+        ```
 
 ### 10.5. PUT
 
@@ -844,6 +905,14 @@ app.use((err, req, res, next) => {
     });
     ```
 
+### 10.7. Definir a porta da aplicação
+
+- Definimos que assim que a aplicação for iniciada, ela ficará escutando requisições na porta `3001`:
+
+    ```
+    app.listen(3001);
+    ```
+
 ## 11. Autenticação via JWT e Passport
 
 ### 11.1. Armazenar senha criptografada
@@ -852,16 +921,16 @@ app.use((err, req, res, next) => {
 
 - Para corrigir essa questão, podemos utilizar a dependência `bcrypt-nodejs`.
 
-```
-const bcrypt = require('bcrypt-nodejs');
+    ```
+    const bcrypt = require('bcrypt-nodejs');
 
-const salt = bcrypt.genSaltSync(10);
-const encryptedPasswd = bcrypt.hashSync(passwd, salt);
-```
+    const salt = bcrypt.genSaltSync(10);
+    const encryptedPasswd = bcrypt.hashSync(passwd, salt);
+    ```
 
-- A terceira linha gera um valor de 10 caractéres aleatórios para ser concatenado a senha, assim, o valor do hash gerado sempre seja diferente, mesmo que a senha seja a mesma.
+- O método `genSaltSync` gera um valor de 10 caractéres aleatórios para ser concatenado a senha. Assim, o valor do hash gerado sempre seja diferente, mesmo que a senha seja a mesma.
 
-- A quarta linha gera o hash, utilizando a senha crua e a string aleatória, que será armazenado no banco no lugar da senha crua.
+- O método `hashSync` gera o hash, utilizando a senha crua e a string aleatória, que será armazenado no banco no lugar da senha crua.
 
 ### 11.2 Criação de usuário via signup
 
@@ -875,29 +944,29 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 
 - Utilizamos a dependência `jwt` (JSON Web Token) para gerar o token de autenticação.
 
-- Para gerar o token, o JWT utiliza algumas informações do usuário, além de um segredo, que deve ficar bem escondido no seu programa:
-
-- Esse código está implementado no projeto em `src/routes/auth.js`.
+- Para gerar o token, o JWT utiliza algumas informações do usuário (exemplo, nome, email e senha), além de um segredo, que deve ficar bem escondido no seu programa:
 
 - Para gerar o token, é verificado se o usuário em questão está cadastrado e se a senha é a mesma que a salva no banco no formato de hash, utilizando o método `bcrypt.compareSync()`. Caso as senhas coincidam, um token é gerado, utilizando o método `encode` da dependência `jwt`, junto das informações do usuário e um segredo. Por fim, esse token gerado é retornado.
 
 - Quando houver tentativa de autenticação com um usuário ou senha inválidos, não informar qual deles está errado para não facilitar a vida de possíveis hackers.
 
+- Esse código está implementado no projeto em `src/routes/auth.js`.
+
 ### 11.4. Não deve acessar uma rota protegida sem token
 
 - Apesar de já termos autenticado o usuário e senha gerando um token, ainda sim é possível acessar as rotas sem realizar esse procedimento, pois as mesmas encontram-se protegidas.
 
+- O processo descrito a seguir encontra-se implementado em `src/config/passport.js`.
+
 - Para realizar a autenticação do token, vamos utilizar as dependências `passport` e `passport-jwt`.
     - O `passport` permite a construção de um middleware para ser responsável pela autenticação de usuários da API;
-    - O `passport-jwt` permite que essa autenticação ocorra utilizando a ideia de JSON Web Tokens.
-
-- Esse código está implementado em `src/config/passport.js`.
+    - O `passport-jwt` permite que essa autenticação ocorra utilizando a tecnica de JSON Web Tokens.
 
 - Inicialmente, é necessário extrair as funcionalidades que vamos utilizar do `passport-jwt`:
     - `Strategy`: objeto responsável por definir a estratégia de autenticação;
-    - `ExtractJwt`: objeto que contém os métodos de obtenção do token da requisição.
+    - `ExtractJwt`: objeto que contém o método de obtenção do token da requisição.
 
-- O parâmetro `params` contém o segredo utilizado para gerar o token de autenticação e o método para obter esse token (no caso, será obtido do header da requisição). Com essas informações, é possível obter os dados do usuário utilizados para gerar o token junto do segredo.
+- O parâmetro `params` contém o segredo utilizado para gerar o token de autenticação e o método para obter esse token (no caso, será obtido do header da requisição). Com essas informações, é possível obter os dados do usuário utilizados para gerar o token, junto do segredo.
 
 - É instanciado um novo objeto `Strategy`, que contém essas informações para obter os dados do usuário, além de uma função que será responsável por realizar a autenticação do token.
 
@@ -909,8 +978,10 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 
 - E o método de autenticação é exportado pelo módulo.
 
-- Essa autenticação deve ser realizada antes de qualquer método de qualquer rota:
+- Após a autenticação do usuário, o passport armazena as informações do usuário, obtidas através do token enviado, em `req.user`.  
+  - Na nossa aplicação, esse artifício é utilizado para impedir que usuários tenham acesso a informações de outros usuários.
 
+- Essa autenticação deve ser realizada antes de qualquer método de qualquer rota:
     ```
     app.route('/users')
         .all(...)
@@ -920,7 +991,9 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 
 - A cláusula `all` exige que qualquer execução daquela rota, seja qual o verbo utilizado, passe por aquele ponto. Em caso de sucesso (nesse caso, usuário validado), a requisição segue seu fluxo natural, em direção ao verbo solicitado.
 
-### 11.5. Enviar token nos testes
+- Na versão final da aplicação desenvolvida, a estratégia utilizada foi um pouco diferente e pode ser vista em `src/config.router.js`.
+
+### 11.5. Enviar token nas requisições
 
 - Para utilizar os endpoints, agora é necessário realizar a autenticação através do token, e isso é feito utilizando a diretiva `set` do `supertest`, após a requisição:
 
@@ -932,7 +1005,9 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 
 ## 12. Manipulação de Datas com Moment
 
-- Uma dificuldade comum entre diferentes programadores é a manipulação de datas. Utilizamos a dependência `moment` para facilitar essa atividade.
+- Uma dificuldade comum entre diferentes programadores é a manipulação de datas.
+
+- Utilizamos a dependência `moment` para facilitar essa atividade.
 
 - Após importar a dependência, podemos armazenar o horário corrente em uma variável da seguinte forma:
 
@@ -942,18 +1017,16 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
     const current = moment(); // Equivalente a const current = new Date();
     ```
 
-- Para adicionar ou subtrair dias de uma data:
+- Para adicionar ou subtrair dias dessa data:
 
     ```
     const past = moment().subtract({ days: 5 });
     const future = moment().add({ days: 5 });
     ```
 
-    - Podemos fazer essa adição ou subtração em dias, meses, anos, horas, minutos, segundos, etc.
-
 ## 13. Commits mais seguros com Husky
 
-- A dependência `husky` permite definirmos `hooks` que executarão comandos sempre antes de um *commit* para realizar validações. Caso alguma dessas validações retorne alguma inconsistência, o mesmo não é commitado até que o desenvolvedor resolva esses problemas.
+- A dependência `husky` permite definirmos `hooks`, que executarão comandos sempre antes de um *commit* para realizar validações. Caso alguma dessas validações retorne alguma inconsistência, o mesmo não é commitado até que o desenvolvedor resolva esses problemas.
     - Exemplo:
 
         ```
@@ -987,32 +1060,32 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 - Para acessar a variável de ambiente pelo Node.JS:
 
     ```
-    console.log(process.env.NOME_VARIAVEL);
+    process.env.NOME_VARIAVEL;
     ```
 
-- O valor da variável de ambiente pode ser definida nos scripts de `package.json`:
+- O valor da variável de ambiente pode ser definida nos scripts de inicialização da aplicação, em `package.json`:
 
     ```
     "scripts": {
-        "start": "set NODE_ENV=production && node src/server.js",
-        "test": "set NODE_ENV=development && jest --coverage --runInBand --forceExit"
+        "start": "set NODE_ENV=production && node src/server.js", // Produção
+        "test": "set NODE_ENV=development && jest --coverage --runInBand --forceExit" // Testes
     },
     ```
 
-    - **Obs.:** Tomar cuidado que o espaço entre o valor da variável de ambiente e o operador de concatenação de comandos do Windows (`&&`) é entendido como parte da variável de ambiente. Das duas umas: remover esse espaço ou realizar um `.trim()` quando a variável for capturada pelo Node.JS:
+- **Obs.:** Tomar cuidado que o espaço entre o valor da variável de ambiente e o operador de concatenação de comandos do Windows (`&&`) é entendido como parte do valor da variável de ambiente. Das duas umas: remover esse espaço ou realizar um `.trim()` quando a variável for capturada pelo Node.JS:
 
-        ```
-        "scripts": {
-            "start": "set NODE_ENV=production&& node src/server.js",
-            "test": "set NODE_ENV=development&& jest --coverage --runInBand --forceExit"
-        },
-        ```
+    ```
+    "scripts": {
+        "start": "set NODE_ENV=production&& node src/server.js",
+        "test": "set NODE_ENV=development&& jest --coverage --runInBand --forceExit"
+    },
+    ```
 
-        ou
+    ou
 
-        ```
-        console.log(process.env.NOME_VARIAVEL.trim());
-        ```
+    ```
+    process.env.NOME_VARIAVEL.trim();
+    ```
 
 ## 15. Segurança nos logs com Winston e UUID
 
@@ -1023,9 +1096,9 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 
 ### 15.1. Winston
 
-- O `winston` é uma dependência que procura facilitar a tarefa de logging, importante principalmente nos casos de disponibilização de informações de erros ocorridos na aplicação.
+- Se utilizarmos as opções nativas do Node.JS, como o `console.log` para escrita no terminal ou a biblioteca `fs` para manipulação de arquivos de texto, a tarefa de *logging* se tornará mais complexa. O `winston` é uma dependência que procura facilitar essa tarefa. 
 
-- Ele permite definirmos `levels` de criticidade para as informações, e direcioná-las para um determinado tipo de output dependendo do seu nível, como por exemplo, o terminal ou um arquivo de logs. Cada uma dessas possibilidades é um `transport`.
+- Ele permite definirmos `levels` de criticidade para as informações, e dado esse nível, direcioná-las para um determinado tipo de output, como por exemplo, o terminal ou um arquivo de logs. Ele chama cada uma dessas possibilidades de um `transport`.
 
 ### 15.2. UUID
 
@@ -1033,53 +1106,75 @@ const encryptedPasswd = bcrypt.hashSync(passwd, salt);
 
 - Utilizando a dependência `uuidv4`, podemos gerar esse identificador único que será gerado para cada erro capturado pela aplicação, e irá retorná-lo para o requisitante.
 
-- Esse UUID pode ser utilizado para fazer uma busca no arquivo de logs de erros da aplicação para obter mais detalhes sobre o ocorrido.
+- Caso deseje reportar o erro, o usuário pode informá-lo aos mantenedores da aplicação, que utilizarão esse UUID para fazer uma busca no arquivo de logs de erros, obtendo assim mais detalhes sobre a falha ocorrida.
 
-## 16. Questões de implementação do projeto
+## 16. Inicialização da aplicação
 
-### 16.1. Divisão de responsabilidades
+### 16.1. Nodemon
 
-### 16.2. Um usuário só consegue visualizar suas próprias informações
+- O `nodemon` é uma dependência utilizada em fase de desenvolvimento para realizar a inicialização de aplicações (*Launcher*).
 
-- Uma coisa que faz sentido é que um usuário consiga manipular apenas suas contas. 
-    - Porém, seu `id` não pode ser extraído da requisição enviada, caso contrário, o requisitante pode inserir qualquer `id` no `body` e com isso obter as informações de outro usuário.
+- Diferentemente de inicializar a aplicação através do comando `node`, onde é necessário reiniciar o processo manualmente para que as alterações realizadas sejam perceptíveis, o Nodemon monitora todos os arquivos da aplicação e caso um deles sofra alguma alteração e essa seja persistida, a dependência logo trata de reinicializar a aplicação automaticamente.
 
-- Uma forma de obter o `id` do usuário que está autenticado, devemos utilizar o atributo `req.user.id`.
-    - Quando realizamos a autenticação do usuário com o token, o `passport` armazena as informações do `payload` em `req.user`.
+### 16.2. pm2
 
-- Da forma que foi construído, mesmo que o usuário passe um `id` na requisição, ele é sobrescrito pelo obtido em `req.user.id`.
+- O `pm2` é uma dependência mais robusta do que o `nodemon`, sendo utilizada em produção para realizar a inicialização da aplicação de forma profissional e segura.
 
-- Podemos configurar um middleware que será executado caso a rota da requisição possua determinado parâmetro:
+- Caso a aplicação seja inicializada utilizando o comando `node` ou o `nodemon`, o processo criado bloqueia o terminal utilizado, e caso seja fechado, o mesmo é encerrado.
+    - No caso do pm2, a linha de comando fica livre para a execução de outras tarefas e é possível fechar o terminal sem interromper o funcionamento da aplicação.
+
+- O pm2 também permite visualizar outras informações, como por exemplo, quantidade de recursos utilizados (processador e memória), número de conexões ativas, requisições e reinicializações, estado atual do processo, etc. 
+
+- Para inicializar uma aplicação:
 
     ```
-    router.param('id', (req, res, next) => {
-        app.services.transaction.find({ 'transactions.id': req.params.id })
-            .then((transaction) => {
-                if (transaction.length > 0 && transaction[0].user_id === req.user.id) next();
-                else throw new RecursoIndevidoError();
-            }).catch((err) => next(err));
-    });
+    pm2 start <arquivo-inicial> --name <nome-processo>
     ```
 
-- Esse middleware verifica se a rota da requisição envia o atributo `id`, e caso sim, compara o `id` do usuário vinculado a transação com o `id` do usuário autenticado, para evitar que pessoas consigam visualizar dados de outras.
+    - Podemos nomear o processo e utilizar essa identificação para manipular a aplicação através do pm2;
+    - Para todo processo inicializado pelo pm2, um identificador numérico na tabela de processos é associado.
 
-### 16.3. Gerenciamento de erros
+- Abrir um dashboard com informações relevantes sobre os processos gerenciados pelo pm2:
 
-- Assim, podemos criar uma função genérica que realizar o tratamento necessário dos erros para devolvê-los aos requisitantes.
+    ```
+    pm2 monit
+    ```
 
-- A partir de agora, as funções invocadas pelas rotas não serão mais responsáveis por devolver esses erros aos usuários.
-    - Os serviços devem identificá-los esses error e lançá-los através da clásula `throw`;
-    - As funções invocadas pelas rotas identificam que um erro foi lançado, através da cláusula `catch`, que permite que esse erro siga em frente utilizando a função `nex(err)`;
-    - A seguinte função em `app.js` receberá o erro ocorrido, vai identificá-lo e retorná-lo da forma mais adequada:
+- Para visualizar as informações de um processo específico:
 
-        ```
-        app.use((err, req, res, next) => {
-            const { name, msg, stack } = err;
+    ```
+    pm2 show <id|nome-processo>
+    ```
 
-            if (name === 'ValidationError') res.status(400).json({ error: msg })
-            else res.status(500).json({ name, msg, stack });
-            next(err);
-        });
-        ```
+- Para reiniciar um processo:
 
-- Podemos criar objetos de erro como `ValidationError` para padronizá-los.
+    ```
+    pm2 restart <id|nome-processo>
+    ```
+
+- Para finalizar o pm2:
+
+    ```
+    pm2 kill
+    ```
+
+## 17. CORS
+
+- CORS (*Cross-origin Resource Sharing*) é uma política utilizada por navegadores web para limitar o acesso a recursos cujo endereço é diferente da origem.
+
+- Os navegadores utilizam headers HTTP para analisar se aquela origem possui permissão para acessar o recurso solicitado.
+
+- É muito comum que aplicações web realizem acesso a diferentes fontes de dados para alimentá-la, assim, a política de CORS é importante para que haja um controle desses recursos que estão sendo acessados para evitar que acessos indevidos não sejam realizados.
+
+- Muito comum a política de CORS barrar o acesso a recursos utilizando o método de requisição `fetch` do JavaScript.
+
+- Para realizar a configuração de CORS do lado do servidor, devemos utilizar a dependência `cors` como middleware:
+
+    ```
+    const cors = require('cors');
+    app.use(cors({ origin: '*' }));
+    ```
+
+- No caso acima, é configurado que qualquer origem pode realizar acesso a API, porém, em casos de aplicações reais, essa não é uma boa prática, sendo melhor limitar quais são as origens que podem utilizar os recursos da API.
+
+- [Clique aqui](https://www.treinaweb.com.br/blog/o-que-e-cors-e-como-resolver-os-principais-erros) para entender mais a fundo a política de CORS. 
