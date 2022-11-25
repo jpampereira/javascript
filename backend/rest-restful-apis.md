@@ -375,3 +375,77 @@
 - **Métodos Idempotentes:** é uma propriedade matemática e da ciência da computação, que quando executada múltiplas vezes o resultado não será alterado depois da primeira vez.
   - Ou seja, o impacto de enviar dez requisições HTTP para um método idempotente será o mesmo de enviar uma única;
   - `GET`, `HEAD`, `PUT`, `DELETE`, `OPTIONS` e `TRACE`.
+
+### 2.10. Autenticação
+
+- Autenticação é uma parte importante de qualquer aplicação Web moderna, ela tem a missão de identificar quem está usando a aplicação e se ela tem permissão para usá-la.
+
+- Alguns websites ainda gerenciam a autenticação através de cookies conforme a RFC 6265.
+	- Mas, cookies são criados para permitir o servidor gravar e manter os estados (**stateful**), o que é completamente contrário ao que o REST propõe (**stateless**), ou seja, uma requisição não depende da outra;
+	- A ideia do *stateless* é permitir aplicações web mais escaláveis e de fácil *caching* para serem mais efetivas.
+
+- O padrão do esquema de autenticação HTTP **basic** e através de **digest** são stateless, mas, atualmente muitas empresas precisam identificar seus usuários e querem diminuir a barreira para que eles usem seus produtos. Isso significa não ficar pedindo a senha do usuário frequentemente, de preferência apenas uma única vez.
+
+- Quando uma aplicação web oferece ferramentas para outras aplicações web através de API, a autenticação pode ser feita através de uma **API Key** ou **API secret token**  como são conhecidas.
+
+- Em resumo, uma API Key é uma combinação de letras e números bem grande, como um hash, e fica sendo transmitida em todas as requisições para identificar a aplicação e geralmente é combinada com um email/senha.
+
+- Aqui vale uma ressalva. Como estas API Keys trafegam entre o servidor e o cliente, é importante que o servidor tenha configurado os **certificados SSL** (https://letencrypt.org/) para garantir a maior segurança possível.
+
+- Diferentemente de aplicações, quando um usuário utiliza um serviço ele também deve ser identificado, geralmente com seu email/senha, mas, enviar esses dados a cada requisição com certeza não é o ideal.
+	- Para tal, uma das soluções é no momento em que o usuário faz o login, o mesmo recebe um token baseado em suas credenciais e daí pra frente o token servirá de identificação nas próximas requisições.
+
+### 2.11. Identificação x Autenticação x Autorização
+
+- `**Identificação:** Para esse conceito vamos usar um exemplo. O Google Maps permite desenvolvedores que possuam apenas a API Key pesquisar endereços. 
+	- Ou seja, eles usam apenas uma API Key para serem **identificados** e caso necessário o Google pode limitar o acesso para a quantidade de requisições, por exemplo;
+	- Mas, desse modo o desenvolvedor pode repassar sua API Key para outros amigos e eles poderão usá-la também.
+
+- **Autenticação:** A autenticação se dá quando comprovamos quem somos, usando por exemplo a combinação login/senha.
+
+- **Autorização:** A autorização por sua vez tem o intuito de definir o que podemos ou não fazer, pois, mesmo que o sistema identifique e me autentique, minhas credenciais podem estar permitidas a apenas ler um determinado conteúdo, por exemplo.
+
+### 2.12. Autenticação com HTTP
+
+- Os mecanismos padrões de autenticação com HTTP são definidos como **Basic** (básica) e **Digest** (resumida).
+	- Esses dois mecanismos foram projetados seguindo as *constraints* REST, ou seja, eles são *stateless*.
+
+- Nesses dois mecanismos o conjunto usuário/senha é incluído em cada requisição, **codificado em Base64** para a autenticação **Basic** e com um **hash MD5** para a autenticação **Digest**.
+
+- A documentação informa que para uma autenticação o cliente deve enviar o header `Authorization` no seguinte formato:
+
+	```
+	Authorization: auth-scheme hashed-credentials
+	```
+
+	- `auth-scheme` é o tipo de autenticação que será realizado;
+	- `hashed-credentials` é o token de autenticação.
+
+- Uma autenticação básica seria:
+
+	```
+	Authorization: Basic am9objpwYXNz
+	```
+
+- Para fazer uma requisição de autenticação básica HTTP via cURL, teríamos:
+
+	```
+	curl -u user:pass http://www.example.com
+	```
+
+	- O parâmetro `-u` é utilizado para passar um usuário e senha. O curl pegará essas credenciais passadas e as converterá para Base64 e enviará o resultado no formato apresentado anteriormente.
+
+- Para a autenticação do tipo **Digest**, teríamos:
+
+	```
+	curl --digest -u user:pass http://www.example.com
+	```
+
+- Em retorno à requisição feita com o header `Authorization`, caso as credenciais não sejam autorizadas, o servidor deve retornar o status code `401 Unauthorized` e setar o header `WWW-Authenticate` com o **tipo de autenticação** que deve ser usado e qual o domínio (realm).
+	
+	```
+	WWW-Authenticate: Basic realm="Perfil"
+	```
+
+	- A diretiva de domínio **realm** é opcional e indica a proteção de um determinado espaço, pois uma mesma aplicação pode-se ter diferentes áreas protegidas usando diferentes esquemas de autenticação.
+
