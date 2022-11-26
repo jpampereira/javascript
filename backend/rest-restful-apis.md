@@ -449,3 +449,137 @@
 
 	- A diretiva de domínio **realm** é opcional e indica a proteção de um determinado espaço, pois uma mesma aplicação pode-se ter diferentes áreas protegidas usando diferentes esquemas de autenticação.
 
+### 2.13. Autenticação baseada em Token
+
+- A autenticação baseada em token consiste em enviar o usuário/senha para o servidor e receber em troca um token que será informado em cada requisição através da header `Authorization`.
+
+- A diferença entre esse método de autenticação e o HTTP visto anteriormente é que no caso do HTTP o próprio browser abre um prompt para o usuário inserir suas credenciais, enquanto no caso do token, essa interação é realizada pelo formulário presente na página web.
+
+- Para enviar as credenciais:
+
+	```
+	curl htp://www.example.com/login \
+	-i -d '{ "mail": "joao@mail.com", "password": "supersecret" }'
+	```
+
+- Resposta informando o token:
+
+	```
+	HTTP/1.1 200 OK
+	Content-Type: application/json
+	Content-Length: 51
+	Connection: keep-alive
+	Server: thin
+
+	{ "access_token": "6afc7f5db9eaaf7eab" }
+	```
+
+- Para realizar requisições com o token:
+
+	```
+	curl -i -H 'Authorization: Token 6afc7f5db9eaaf7eab' \
+	http://localhost:4567
+	```
+
+- Geralmente essa é a escolha para o uso em Web APIs, mas ela não é considerada *stateless* pois o servidor precisará armazenar o Token e isso caracteriza manter o estado.
+
+- Qual o mal da conexão stateful?
+	- Será necessário replicar os dados armazenados na medida em que se escala o número de servidores para que todos possuam o token para realizar a autenticação;
+	- Quando tiver muitos clientes você precisará gerir muitos tokens;
+	- Se cada cliente armazenado tiver mais de um token, isso pode dobrar facilmente.
+
+### 2.14. Stateless Authentication com OAuth
+
+- Documentação oficial: https://oauth.net/
+
+- É um protocolo aberto para realizar autenticação segura através de um método simples e padronizado para aplicações web, mobile e desktop.
+
+- Consiste em utilizar um servidor intermediário para realizar a autenticação dos usuários da aplicação.
+
+- Exemplo: 
+	1. Desejamos realizar a autenticação em um serviço e o mesmo nos da a opção fazer isso utilizando o Facebook; 
+	2. O serviço retorna um token que deve ser utilizado no Facebook para validar o acesso;
+	3. Após validar o acesso com o Facebook, o mesmo retorna um token que deve ser utilizado para fazer a validação do lado do serviço;
+	4. O serviço confirmará com o Facebook se ele mesmo gerou aquele token. Em casos positivos, o acesso é liberado ao usuário.
+
+- Pergunta: Isso realmente é *stateless*?
+
+### 2.15. Stateless Authentication com JWT (JSON Web Tokens)
+
+- Documentação oficial: https://jwt.io/
+
+- JSON Web Tokens (JWT) é um padrão aberto (RFC 7519) que define uma forma compacta (para evitar overhead) e autocontida (pois o token deve conter todas as informação necessárias para realizar a validação) para transmissão de dados segura entre partes, utilizando objetos JSON.
+
+- O OAuth utiliza um servidor intermediário para realizar a autenticação do cliente, porém, alguns entendem que esse tipo de autenticação não é *stateless*. No JWT, por sua vez, todas as informações para realizar a autenticação estão em posse do cliente, não sendo necessário armazenar nenhuma informação do lado do servidor.
+
+- Como é criado o token:
+	- O token é formado por três partes:
+
+		```
+		xxxxx.yyyyy.zzzzz
+		```
+
+	- A primeira parte é formada por um JSON que armazena quais os tipos de encriptação e formato de autenticação utilizados e é codificado utilizando **Base64Url**:
+
+		```
+		{
+			"alg": "HS256",
+			"typ": "JWT"
+		}
+		```
+
+	- A segunda parte também é um JSON convertido em Base64Url, que contém informações sobre o usuário que está tentando realizar a autenticação, como por exemplo, nome e e-mail:
+
+		```
+		{
+			"name": "Joao",
+			"mail": "joao@mail.com"
+		}
+		```
+
+	- A terceira parte é a assinatura, utilizada para realizar a validação do token. Ela é formada pelas duas primeiras partes, codificadas em Base64Url, juntos de um segredo, uma string que apenas o servidor tem conhecimento e permite que ele realize essa validação. Essas informações são criptografadas utilizando o algoritmo especificado em `alg`, no primeiro trecho:
+
+		```
+		HMACSHA256(
+			base64UrlEncoded(header) + "." +
+			base64UrlEncoded(payload),
+			secret)
+		```
+
+	- Seja `secret = "Segredo!"`, o token JWT nesse caso será:
+
+		```
+		eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9hbyIsIm1haWwiOiJqb2FvQG1haWwuY29tIn0.UZRFEKZd7qAEzwKC5iiQylkeCgK1ikn3JrF3Fsl9odM
+		```
+
+- Como funciona a autenticação com JWT:
+
+	![Autenticação JWT](./imagens/autenticacao-jwt.PNG)
+
+	1. O cliente realiza uma requisição do tipo POST, enviando em seu corpo as credenciais de acesso, para um endpoint específico, como por exemplo, `/login`;
+	2. Caso as credenciais estejam corretas, o servidor envia no corpo da resposta o token JWT;
+	3. Para toda requisição realizada, o cliente deve enviar no header `Authorization` o token em questão;
+	4. O servidor realiza a validação do token enviado na requisição utilizando um segredo e em caso de aceite, envia os dados do recurso solicitado pelo cliente.
+
+- Autenticação pelo cURL:
+	- Requisição:
+
+		```
+		curl -X POST http://www.example.com/login \
+		- H "Content-Type: application/json" \
+		- d '{ "username": "Joao", "password": "123456" }'
+		```
+
+	- Resposta:
+
+		```
+		{
+			"authorization_bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9hbyIsIm1haWwiOiJqb2FvQG1haWwuY29tIn0.UZRFEKZd7qAEzwKC5iiQylkeCgK1ikn3JrF3Fsl9odM"
+		}
+		```
+
+- Solicitando um recurso utilizando token JWT:
+
+	```
+	curl http://www.example.com/resource/1 -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9hbyIsIm1haWwiOiJqb2FvQG1haWwuY29tIn0.UZRFEKZd7qAEzwKC5iiQylkeCgK1ikn3JrF3Fsl9odM"
+	```
