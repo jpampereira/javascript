@@ -583,3 +583,211 @@
 	```
 	curl http://www.example.com/resource/1 -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9hbyIsIm1haWwiOiJqb2FvQG1haWwuY29tIn0.UZRFEKZd7qAEzwKC5iiQylkeCgK1ikn3JrF3Fsl9odM"
 	```
+
+## 3. Projetando e Documentando nossa primeira API RESTful
+
+### 3.1. Conhecendo o Swagger.io
+
+- Documentação oficial: https://swagger.io/
+
+- É uma ferramenta que permite projetar, gerar o código em diferentes linguagens de programação e e até mesmo gerar a documentação das nossas APIs.
+
+### 3.2. Swagger Editor
+
+- [Clique aqui](http://editor.swagger.io/) para acessar o Swagger Editor.
+
+- A API é projetada utilizando um documento YAML e a partir dele podemos fazer um build para determinada linguagem de programação (opção `Generate Server`) e sua documentação (opção `Generate Client`).
+
+### 3.3. API Projetada
+
+- Vamos projetar uma API que vai manipular usuários, portanto, nosso recurso (*resource*) será `users`.
+	- Não esquecer da convenção de sempre colocar como nome do recurso um substantivo no plural.
+
+- `Users` possuirá três atributos:
+	- `id`: inteiro, chave primária;
+	- `email`: texto;
+	- `name`: texto.
+
+- Em cima desse recurso vamos realizar as operações de **CRUD** (**C**REATE, **R**EAD, **U**PDATE, **D**ELETE) e utilizaremos uma representação em JSON (Ex.: `{ "name": "Joao Pedro Pereira", email: "joao@email.com" }`).
+
+### 3.4. Documento YAML gerado
+
+```
+swagger: '2.0'
+info:
+  title: Lista de Usuários
+  description: Essa API provê o acesso aos usuários do sistema.
+  contact:
+    name: João Pedro de Abreu Martins Pereira
+    email: jpampereira@gmail.com
+  version: 0.0.1
+# the domain of the service
+host: api.meusite.com
+# Array of all schemes that your API supports
+schemes:
+  - https
+#will be prefixed to all paths
+basePath: /v1
+produces:
+  - application/json
+paths:
+  /users:
+    get:
+      summary: 'Listar os usuários'
+      description: 'Esse endpoint retorna uma lista com **todos** os usuários cadastrados na aplicação.'
+      tags:
+        - Users
+      responses:
+        200:
+          description: 'Retorna uma lista de usuários.'
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+        default:
+          description: 'Erro inesperado.'
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      summary: 'Criar um usuário'
+      description: 'Esse endpoint cria um usuário no sistema.'
+      parameters:
+        - name: user
+          in: body
+          description: 'Usuário'
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      tags:
+        - Users
+      responses:
+        201:
+          description: 'Usuário cadastrado com sucesso!'
+          schema:
+            $ref: '#/definitions/User'
+        default:
+          description: 'Erro inesperado.'
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: 'Atualizar um usuário'
+      description: 'Esse endpoint atualiza um usuário no sistema. O ID deve ser informado. Nesse caso, todo o usuário é atualizado.'
+      parameters:
+        - name: user
+          in: body
+          description: 'Usuário'
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      tags:
+        - Users
+      responses:
+        200:
+          description: 'Usuário atualizado com sucesso!'
+          schema:
+            $ref: '#/definitions/User'
+        404:
+          description: 'Usuário não encontrado! Não esqueça de informar o ID.'
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: 'Erro inesperado.'
+          schema:
+            $ref: '#/definitions/Error'
+    patch:
+      summary: 'Atualizar um usuário'
+      description: 'Esse endpoint atualiza um usuário no sistema. O ID deve ser informado. Nesse caso, apenas os atributos informados são atualizados.'
+      parameters:
+        - name: user
+          in: body
+          description: 'Usuário'
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      tags:
+        - Users
+      responses:
+        200:
+          description: 'Usuário atualizado com sucesso!'
+          schema:
+            $ref: '#/definitions/User'
+        404:
+          description: 'Usuário não encontrado! Não esqueça de informar o ID!.'
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: 'Erro inesperado.'
+          schema:
+            $ref: '#/definitions/Error'
+  /users/{id}:
+    get:
+      summary: 'Mostrar apenas um usuário'
+      description: 'Esse endpoint retorna **apenas o usuário a qual foi informado o id**.'
+      parameters:
+      - name: id
+        in: path
+        description: 'ID do usuário'
+        required: true
+        type: integer
+      tags:
+        - Users
+      responses:
+        200:
+          description: 'Retorna um usuário'
+          schema:
+            $ref: '#/definitions/User'
+        default:
+          description: 'Erro inesperado.'
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: 'Apagar um usuário'
+      description: 'Esse endpoint apaga o usuário a qual foi informado o **id**.'
+      parameters:
+      - name: id
+        in: path
+        description: 'ID do usuário'
+        required: true
+        type: integer
+      tags:
+        - Users
+      responses:
+        200:
+          description: 'Usuário removido com sucesso!'
+        404:
+          description: 'Usuário não encontrado.'
+          schema:
+            $ref: '#/definitions/Error'
+        410:
+          description: 'Esse usuário não existe mais.'
+        default:
+          description: 'Erro inesperado.'
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  User:
+    type: object
+    required:
+      - email
+      - name
+    properties:
+      id:
+        type: integer
+        description: 'Código do usuário'
+      email:
+        type: string
+        description: 'E-mail do usuário'
+      name:
+        type: string
+        description: 'Nome do usuário'
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+      fields:
+        type: string
+```
