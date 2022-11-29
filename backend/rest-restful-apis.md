@@ -14,7 +14,7 @@
 
 - **Analogia:** para um DJ conseguir tocar, ele deve conhecer o que os botões dos seus aparelhos de trabalho fazem. Nas APIs, esses botões seriam as rotinas da APIs, que descrevem as ações que podem ser realizadas no serviço que aquela API cobre.
 
-- Com o advente dos *client-side frameworks*, mais e mais desenvolvedores estão se preocupando em desenvolver o back-end que é compartilhado entre diferentes sistemas.
+- Com o advento dos *client-side frameworks*, mais e mais desenvolvedores estão se preocupando em desenvolver o back-end que é compartilhado entre diferentes sistemas.
 
 - A API não fica vinculada a um único tipo de sistema ou linguagem de programação.
 
@@ -156,8 +156,8 @@
 	| `-d` | Utilizamos essa opção quando queremos enviar dados no corpo da requisição. | `-d '{ "name" : "João" }'` |
 	| `-i` ou `-include` | A resposta da requisição mostrará o cabeçalho, além do corpo com os dados solicitados. | - |
 	| `-I` ou `-head` | A resposta da requisição mostrará apenas o cabeçalho, sem o corpo. | - |
-	| `-X` ou `-request` | Essa opção determina o método/verbo HHTP que deve ser utilizado. Por padrão, é utilizado o `GET`. | - |
-	| `-v` | Faz com que o resultado seja mais verboso, mostrando de fato como ocorreu a requisição. | - |
+	| `-X` ou `-request` | Essa opção determina o método/verbo HHTP que deve ser utilizado. Por padrão, é utilizado o `GET`. | `-X POST` |
+	| `-v` | Faz com que o resultado seja mais verboso, mostrando o passo a passo realizado na conversa entre cliente e servidor, como o *Three-way handshake*. | - |
 	| `--help` | Lista de flags com suas descrições. | - |
 
 - Fake REST API online para testes: `https://jsonplaceholder.typicode.com/`.
@@ -580,7 +580,7 @@
 
 - Para casos onde temos uma aplicação que deve realizar consultas em um banco de dados para cada requisição enviada, isso pode se tornar extremamente custoso dependendo da quantidade de requisições por minuto ou segundo, sendo necessário muito servidores (ou servidores parrudos) para darem conta de todo esse trabalho. Ou talvez uma alternativa seja utilizar *caching*.
 
-- Na compitação, qualquer valor que é difícil e computacionalmente custoso de obter deve ser cacheado.
+- Na computação, qualquer valor que é difícil e computacionalmente custoso de obter deve ser cacheado.
 
 - As únicas coisas que não devem ser cacheadas são as que mudam com muita frequência.
 
@@ -742,7 +742,7 @@
 	curl http://www.mysite.com/users -H "Accept: application/json"
 
 	HTTP/1.1 200 OK
-	Vary: Accept
+	Vary: Content-Type
 	Cache-Control: max-age=86400
 	Content-Type: application/json
 	Content-Length: 128
@@ -760,7 +760,7 @@
 		-H "Accept-Encoding: gzip"
 
 	HTTP/1.1 200 OK
-	Vary: Accept, Accept-Language, Accept-Encoding
+	Vary: Content-Type, Content-Language, Content-Encoding
 	Cache-Control: max-age=86400
 	Content-Type: application/xml
 	Content-Language: br
@@ -791,7 +791,7 @@
 
 ### 2.20. Identificação x Autenticação x Autorização
 
-- `**Identificação:** Para esse conceito vamos usar um exemplo. O Google Maps permite desenvolvedores que possuam apenas a API Key pesquisar endereços. 
+- **Identificação:** Para esse conceito vamos usar um exemplo. O Google Maps permite desenvolvedores que possuam apenas a API Key pesquisar endereços. 
 	- Ou seja, eles usam apenas uma API Key para serem **identificados** e caso necessário o Google pode limitar o acesso para a quantidade de requisições, por exemplo;
 	- Mas, desse modo o desenvolvedor pode repassar sua API Key para outros amigos e eles poderão usá-la também.
 
@@ -827,7 +827,7 @@
 	curl -u user:pass http://www.example.com
 	```
 
-	- O parâmetro `-u` é utilizado para passar um usuário e senha. O curl pegará essas credenciais passadas e as converterá para Base64 e enviará o resultado no formato apresentado anteriormente.
+	- O parâmetro `-u` é utilizado para passar um usuário e senha. O cURL pegará essas credenciais passadas e as converterá para Base64 e enviará o resultado no formato apresentado anteriormente.
 
 - Para a autenticação do tipo **Digest**, teríamos:
 
@@ -913,7 +913,7 @@
 		xxxxx.yyyyy.zzzzz
 		```
 
-	- A primeira parte é formada por um JSON que armazena quais os tipos de encriptação e formato de autenticação utilizados e é codificado utilizando **Base64Url**:
+	- A primeira parte (`xxxxx`) é formada por um JSON que armazena quais os tipos de encriptação e formato de autenticação utilizados e é codificado utilizando **Base64Url**:
 
 		```
 		{
@@ -922,7 +922,7 @@
 		}
 		```
 
-	- A segunda parte também é um JSON convertido em Base64Url, que contém informações sobre o usuário que está tentando realizar a autenticação, como por exemplo, nome e e-mail:
+	- A segunda parte (`yyyyy`) também é um JSON convertido em Base64Url, que contém informações sobre o usuário que está tentando realizar a autenticação, como por exemplo, nome e e-mail:
 
 		```
 		{
@@ -931,7 +931,7 @@
 		}
 		```
 
-	- A terceira parte é a assinatura, utilizada para realizar a validação do token. Ela é formada pelas duas primeiras partes, codificadas em Base64Url, juntos de um segredo, uma string que apenas o servidor tem conhecimento e permite que ele realize essa validação. Essas informações são criptografadas utilizando o algoritmo especificado em `alg`, no primeiro trecho:
+	- A terceira parte (`zzzzz`) é a assinatura, utilizada para realizar a validação do token. Ela é formada pelas duas primeiras partes, codificadas em Base64Url, juntos de um segredo, uma string que apenas o servidor tem conhecimento e permite que ele realize essa validação. Essas informações são criptografadas utilizando o algoritmo especificado em `alg`, no primeiro trecho:
 
 		```
 		HMACSHA256(
