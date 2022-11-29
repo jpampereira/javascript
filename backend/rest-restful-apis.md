@@ -376,7 +376,401 @@
   - Ou seja, o impacto de enviar dez requisições HTTP para um método idempotente será o mesmo de enviar uma única;
   - `GET`, `HEAD`, `PUT`, `DELETE`, `OPTIONS` e `TRACE`.
 
-### 2.10. Autenticação
+### 2.10 Modelo de Maturidade Richardson
+
+- Apesar de Roy Fielding deixar bastante claro que para uma API ser considerada RESTful, ela precisa obrigatoriamente seguir todas as *constraints* definidas em seu trabalho. Na prática, muitas vezes precisamos de uma abordagem um pouco mais simples.
+
+- Sendo assim, Leonard Richardson propôs um modelo de quatro níveis para que alcancemos uma API REST, onde passo-a-passo podemos ir melhorando a API e também ter a percepção de qual nível de maturidade ela se encontra.
+
+- Os níveis 0, 1 e 2 talvez sejam mais familiares, e de fato são mais fáceis de implementar, porém, deve ficar claro que os mesmos não são considerados RESTful.
+
+#### 2.10.1. Nível 0 - POX
+
+- Você certamente já deve ter desenvolvido ou visto em algum lugar uma API que segue esse modelo de design. Apesar de ser o nível mais distante do que de fato REST propõe, muitas APIs ditas como RESTful se encontram nesse nível de maturidade.
+
+- Nesse nível, as mensagens podem ser serializadas em formatos como XML, JSON ou outros.
+  - É importante lembrar, como dito anteriormente, que não é o formato da mensagem que define ou não se um sistema é REST.
+
+- Nesse nível, as normas para nomeação dos recursos não são respeitadas.:
+
+	```
+	POST /salvarCliente
+
+	<salvarCliente>
+	<Nome>João Pedro Pereira </Nome>
+	...
+	</salvarCliente>
+	```
+
+	- A URI não deve fazer menção a ação realizada (isso é papel dos verbos HTTP) e sim ao recurso manipulado.
+
+- Os métodos HTTP também não utilizados de forma adequada:
+
+	| Verbo HTTP | URI | Ação |
+	| ---- | ---- | ---- |
+	| GET | /buscarCliente/1 | Visualizar |
+	| POST | /salvarCliente | Criar |
+	| POST | /alterarCliente/1 | Alterar |
+	| GET/POST | /deletarCliente/1 | Remover |
+
+- Um outro problema constantemente encontrado, é a manipulação incorreta dos códigos de resposta do HTTP. Códigos e mensagens de erro são frequentemente manipuladas nas mensagens geradas pela aplicaçação, o que impede que elementos de gateway e proxy trabalhem de forma adequada:
+
+	```
+	GET /buscarCliente/1
+
+	HTTP/1.1 200 OK
+
+	<buscarCliente>
+	<status>Cliente não encontrado</status>
+	<codigo>404</codigo>
+	</buscarCliente>
+	```
+
+	- Apesar da mensagem sugerir que o cliente solicitado não foi encontrado, a resposta HTTP apresenta uma informação totalmente diferente (`200 OK`), ou seja, existe uma diferença semântica entre a resposta HTTP e a representação gerada pela aplicação.
+
+- Em resumo, no nível 0 podemos dizer que você nem mesmo está utilizando o HTTP de forma correta.
+
+#### 2.10.2. Nivel 1 - Recursos
+
+- No nível 1, passamos a usar recursos como forma de modelar e organizar a API. Neste nível, não precisamos conhecer a funcionalidade de cada método e sim apenas o recurso ao qual temos acesso.
+
+- Evoluímos para:
+
+	| Verbo HTTP | URI | Ação |
+	| --- | --- | --- |
+	| GET | /cliente/1 | Visualizar |
+	| POST | /cliente | Criar |
+	| PUT | /cliente/1 | Alterar |
+	| DELETE | /cliente/1 | Remover |
+
+- Começamos a utilizar os conceitos de recursos que foram apresentados no início do curso.
+
+- Modelamos corretamente os recursos, agora precisamos usar os métodos HTTP da forma correta, para que a gente possa criar todas as interações necessárias sob um recurso.
+
+- No nível 1 dizemos que agora temos recursos!
+
+#### 2.10.3. Nível 2 - Verbos HTTP
+
+- Nesse nível, o HTTP deixa de exercer um papel apenas de transporte e passa a exercer um papel semântico na API, ou seja, seus verbos passam a ser utilizados com o propósito para o qual foram criados.
+
+- Começamos a utilizar os recursos, métodos HTTP e Status Code de forma correta.
+
+- Enviando:
+
+	```
+	POST /cliente
+
+	<Cliente>
+	<Nome>João Pedro Pereira</Nome>
+	...
+	</Cliente>
+	```
+
+- Recebendo:
+
+	```
+	201 CREATED
+	Location: /cliente/1
+	```
+
+- É importante notar 2 aspectos nessa resposta: 
+  - O primeiro é a utilização correta da resposta `201 CREATED`. Como foi solicitado a criação de um recurso, nada mais adequado que uma resposta que informe que o recurso foi criado com sucesso.;
+  - Além disso, um importante aspecto é a presença do *Header* `Location`. Esse *Header* informa em qual endereço o recurso criado se encontra disponível.
+
+- No nível 2 dizemos que agora utilizamos os verbos HTTP de forma correta.
+
+- [Clique aqui](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) para verificar a documentação MDN com os Status Code disponíveis.
+
+#### 2.10.4. Nível 3 - HATEOAS (Hypermedia As The Engine Of Application State)
+
+- Em seu blog pessoal, Fielding deixa muito claro que APIs que não utilizam HATEOAS não podem ser consideradas RESTful, mesmo assim, você vai encontrar muitos conteúdos sobre REST que nem ao menos cita essas características.
+
+- Apesar de aparentemente ser algo não muito familiar, HATEOAS é um conceito presente no dia-a-dia de todos os usuários da web. Ele tem como elemento principal uma representação Hypermedia, que permite descrever seu estado atual e quais os seus relacionamentos com outros futuros estados.
+
+	```
+	GET /cliente/1
+
+	HTTP/1.1 200 OK
+
+	<Cliente>
+		<Id>1</Id>
+		<Nome>João Pedro Pereira</Nome>
+		<link rel="deletar" href="/cliente/1" />
+		<link rel="notificar" href="/cliente/1/notificacao" />
+	</Cliente>
+	```
+
+  - No exemplo acima, o cliente da API deverá entender o significado dos relacionamentos "deletar" e "notificar" para que consiga de fato consumir os links de forma adequada.
+
+- No nível 3 dizemos que temos controle de Hypermedia!
+
+### 2.11. Outras ferramentas para realizar requisições HTTP
+
+- HTTPie: Ferramenta de linha de comando parecida com o curl, porém, com mais opções;
+- Postman: Opção com interface gráfica;
+- REST Client: Extensão do Visual Studio Code.
+
+### 2.12. Media Types
+
+- Media Type é uma string que define qual o formato do dado e como ele deve ser lido pela máquina. Isso permite um computador diferenciar entre JSON e XML, por exemplo.
+
+- Exemplos de Media Types:
+  - `application/json`;
+  - `application/xml`;
+  - `multipart/form-data`;
+  - `text/html`.
+
+- Um Media Type é composto por duas partes separadas por uma barra. A primeira se refere ao tipo e a segunda ao subtipo. Também é possível especificar alguns parâmetros adicionais, como por exemplo `charset=UTF-8`.
+
+- A primeira parte contém um tipo registrado de alto nível, que pode ser: application, audio, image, text, example, message, model, multipart e video.
+
+- Para informar o Media Type, usamos o *Header Field* `Accept` no momento da requisição.
+
+- O `mockbin.org` é um serviço que permite testar requisições HTTP.
+
+	```
+	curl mockbin.org/request -H 'Accept: application/xml' 
+	```
+
+- Esse *Header Field* não se limita apenas a um valor, pode-se também encadear outros tipos em uma mesma requisição, bastando para isso separá-las por vírgula.
+
+	```
+	curl mockbin.org/request -H 'Accept: application/json;q=0.5,application/xml;q=0.1'
+	```
+
+	- O parâmetro `q` define *Quality Factor*, que informa a ordem preferida de retorno da requisição. Esse parâmetro deve estar no intervalo de 0 à 1, sendo 1 o de maior prioridade;
+	- No exemplo acima, a  preferência é pelo retorno da requisição no formato JSON.
+
+- **MIME Type** era o nome utilizado para **Media Type** antigamente.
+
+- `Content-Type` vs `Accept`: é comum a confusão entre os campos, mas devemos saber que o `Content-Type` é o campo que identifica o formato do conteúdo da requisição, ou seja, em uma requisição do tipo `POST`, o formato dos dados enviados no corpo deve ser indicado por `Content-Type`, enquanto o `Accept` informa o tipo de retorno do servidor.
+
+### 2.13. Gerindo Erros
+
+- Naturalmente, quando fazemos requisições RESTful, receberemos como retorno um possível erro, seja por falha no formato da requisição, seja por causas internas referentes ao servidor (erros mais comuns).
+
+- Isso não significa que o retorno apresentado seja uma mensagem clara, que não deixa dúvidas sobre o que aconteceu de fato.
+
+- Pois bem, o intuito da gerência de erros em APIs RESTful é informar ao requisitante uma mensagem que retrate o que de fato ocorreu. Mais do que isso, um **status code** que não seja genérico e sim, útil.
+
+- Existem cinco classes de HTTP Status Code. São elas:
+  - **1xx Informacional:** Códigos começados com 1 são conhecidos como códigos informacionais. A maioria deles não são usados nos dias atuais;
+  - **2xx Success:** Esses códigos indicam que houve sucesso no intercâmbio entre servidor e cliente; 
+  - **3xx Redirection:** Os códigos 3xx indicam que cliente deve fazer uma ação adicional antes da requisição estar completa;
+  - **4xx Client Error:** Nesse caso, o código indica que existe algo errado com a requisição do cliente;
+  - **5xx Server Error:** O cliente enviou uma requisição válida, mas o servidor não foi capaz de processá-la com sucesso.
+
+### 2.14. Versionamento
+
+- Versionamento não faz parte das *constraints* REST, nem também do Modelo de Maturidade Richardson, mas é indispensável para criar APIs que sofrem mudanças ao longo do tempo.
+
+- Opções:
+  - **Subdomínio:** `api1.example.com/users`;
+  - **URL:** `example.com/v1/users`;
+  - **URL com parâmetros:** `example.com/users?v=1`;
+  - **HTTP Header customizado:** `X-API-Version: 1`;
+  - **Accept Header com Media Type customizado:** `Accept: application/vnd.myapi.v2+json`;
+  - **Accept Header com opção de versão:** `Accept: application/vnd.myapi+json;version=2.0`.
+
+- Atualmente, uma dos mais utilizados é o versionamento através de URL, por ser de fácil implementação, evita erros por parte de programadores novatos, e permitir compartilhar URLs facilmente.
+
+### 2.15. Caching
+
+- Caching é extremamente importante, não só para os usuários, mas também para reduzir o custo de rodar aplicações.
+
+- Para casos onde temos uma aplicação que deve realizar consultas em um banco de dados para cada requisição enviada, isso pode se tornar extremamente custoso dependendo da quantidade de requisições por minuto ou segundo, sendo necessário muito servidores (ou servidores parrudos) para darem conta de todo esse trabalho. Ou talvez uma alternativa seja utilizar *caching*.
+
+- Na compitação, qualquer valor que é difícil e computacionalmente custoso de obter deve ser cacheado.
+
+- As únicas coisas que não devem ser cacheadas são as que mudam com muita frequência.
+
+- Uma vez feito o cache, como saber que ele está desatualizado.
+  - Esse processo chama-se *cache invalidation* (invalidação de cache) e não é algo simples de se fazer;
+  - Para nossa sorte, o HTTP já conta com tudo que precisamos para fazer cache do lado do cliente.
+
+- Pontos chave sobre *caching*:
+  - Cache pode salvar uma enorme quantidade de tempo;
+  - A medida que diminuimos o tempo de requisição, suas aplicações precisarão de menos poder para rodar e isso implica em gastar menos com servidores;
+  - Cache permite uma aplicação escalar mais facilmente, especialmente se a maioria das requisições retornam dados;
+  - Infelizmente nem tudo pode ser cacheado. Alguns dados *real-time* precisam ser buscado todas as vezes. O restante pode ser cacheado por um período de tempo, seja alguns segundos ou um dia, dependendo da frequência em que os dados mudam.
+
+### 2.16. Cache no Cliente
+
+- Os objetivos do caching HTTP são eliminar o envio de requisições o máximo possível, e caso uma requisição precise ser feita, reduzir os dados de resposta.
+
+- O primeiro objetivo pode ser alcançado usando-se um mecanismo de expiração conhecido como `Cache-Control`, e o segundo é através do mecanismo de validação `ETag` ou `Last-Modified`.
+
+- O header `Cache-Control` pode ser usado para definir uma política de cache para um recurso.
+  - Exemplos:
+
+	```
+	Cache-Control: max-age=3600
+	Cache-Control: no-cache
+	Cache-Control: private, max-age=86400
+	```
+
+  - **max-age:** Especifica em segundos quanto tempo o recurso pode ser cacheado. É interessante notar que esse cache também pode ser feito por intermediários, como roteadores e proxys, não só o browser em si;
+  - **private/public:** Define quem pode fazer o cache. **Public** significa que qualquer um pode fazer o cache. **Private** por sua vez indica que o cache só pode ser feito pelo browser, ou seja, os intermediários como os CDNs, roteadores e proxys não podem fazer cache;
+  - **no-cache/no-store:** Essas duas diretivas se confundem, mas a **no-store** informa que a resposta não deve ser armazenada seja no browser ou em seus intermediários, já o **no-cache** significa que a resposta pode ser cacheada, mas não pode ser reusada sem antes checar o servidor. ela pode ser combinada com um **ETag** a que veremos a seguir;
+  - Existem outras diretivas que podem ser utilizadas.
+
+- Exemplo:
+
+	```
+	pepspereira@DESKTOP-6GVS9B2:~$ curl -I http://ge.globo.com
+	HTTP/1.1 301 Moved Permanently
+	X-Served-From: Core, Show Services GCP
+	Expires: Thu, 24 Nov 2022 05:04:42 GMT
+	Cache-Control: max-age=10
+	X-XSS-Protection: 1; mode=block
+	X-Request-Id: d662fcb0-e561-45be-ab24-f1102f97e78f
+	Location: https://ge.globo.com/
+	Content-Security-Policy: upgrade-insecure-requests
+	Date: Thu, 24 Nov 2022 05:04:32 GMT
+	X-Content-Type-Options: nosniff
+	Content-Type: text/html
+	X-Mobile: desktop
+	Age: 0
+	Vary: X-Forwarded-Proto, Accept-Encoding, User-Agent, Wall-Subscription-Level, Origin
+	X-Bip: 819476926 asra01lx16ca01.globoi.com
+	Via: 2.0 CachOS
+	Content-Length: 162
+	Connection: keep-alive
+	```
+
+	- Podemos ver no exemplo acima que o site do Globo Esporte utiliza um cache de 10 segundos.
+
+### 2.17. ETag
+
+- Até agora vimos como prevenir requisições usando o header `Cache-Control`, mas infelizmente na maior parte das APIs web isso é raramente possível.
+
+- Outra forma de ganhar tempo e largura de banda é usando o header **ETag**.
+
+- **ETag** vem de **Entity Tag** e destina-se a ssegurar um token de validação identificando uma versão específica de uma resposta.
+
+- Exemplo:
+	- Em um primeiro momento, um cliente faz uma requisição de um recurso (`/users/jackson`), na resposta o servidor inclui o token atual (`12345`)na header **ETag**.
+
+		```
+		curl http://www.example.com/users/jackson
+
+		HTTP/1.1 200 OK
+		Content-Length: 2048
+		ETag: "12345"
+
+		[DATA]
+		```
+
+	- Em um segundo momento o cliente envia uma nova requisição para `/users/jackson` e inclui o token **ETag** recebido no header `If-None-Match`. Quando a requisição é recebida pelo servidor, ele checa o valor do header If-None-Match e compara com o ETag atual.
+	- Caso não haja modificações
+
+		```
+		curl http://www.example.com/users/jackson \
+		-H 'If-None-Match: "12345"'
+
+		HTTP/1.1 304 Not Modified
+		ETag: "12345"
+		```
+
+	- Caso haja modificações
+
+		```
+		curl http://www.example.com/users/jackson \
+		-H 'If-None-Match: "12345"'
+
+		HTTP/1.1 200 OK
+		Content-Length: 2048
+		ETag: "6789"
+
+		[DATA]
+		```
+
+- É importante lembrar que o token ETag pode ter uma representação de letras e números, como por exemplo um HASH. Por outro lado, um hash ao ser calculado tem um custo computacional considerável, então, caso o recurso seja atualizado diversas vezes, talvez ele não seja a melhor solução.
+
+- Contrapondo ao hash, é possível usar a data da última atualização (**timestamp**) do recurso para verificar se o mesmo encontra-se desatualizado.
+  - Para esses casos o melhor é usar a header `Last-Modified` associado à header `If-Modified-Since`, seguindo a mesmo lógica do **ETag**.
+
+- Exemplo:
+	- Requisição inicial:
+
+		```
+		curl http://www.example.com/users/jackson
+
+		HTTP/1.1 200 OK
+		Content-Length: 2048
+		Last-Modified: Sun, 29 Apr 1998 05:00:00 GMT
+
+		[DATA]
+		```
+	
+	- Em caso de não modificação desde a última solicitação:
+
+		```
+		curl http://www.example.com/users/jackson \
+		-H 'If-Modified-Since: Sun, 29 Apr 1998 05:00:00 GMT'
+
+		HTTP/1.1 304 Not Modified
+		Last-Modified: Sun, 29 Apr 1998 05:00:00 GMT
+		```
+
+	- Em caso de modificação desde a última solicitação:
+
+		```
+		curl http://www.example.com/users/jackson \
+		-H 'If-Modified-Since: Sun, 29 Apr 1998 05:00:00 GMT'
+
+		HTTP/1.1 200 OK
+		Content-Length: 2050
+		Last-Modified: Mon, 30 Apr 1998 06:00:00 GMT
+
+		[DATA]
+		```
+
+- Deve-se lembrar ainda que existem outros headers que podem ser usados para criar requisições HTTP condicionais.
+
+### 2.18. Cache com diferentes tipos de representação
+
+- Pelo que vimos até agora, podemos fazer requisições para diferentes tipos de representação usando para isso o header `Accept`.
+
+- Mas o que ainda não sabemos é que nosso browser, por padrão, usa o método HTTP e a URI como chave para registrar respostas cacheadas, ou seja, mesmo que tenhamos várias representações diferentes, por se tratar do mesmo verbo HTTP e mesma URI, o browser ficará confuso de qual resposta deve fazer cache.
+
+- Para resolver esse problema, existe o header `Vary`, que permite indicarmos outros itens para a composição da chave do cache.
+
+- Exemplo:
+
+	```
+	curl http://www.mysite.com/users -H "Accept: application/json"
+
+	HTTP/1.1 200 OK
+	Vary: Accept
+	Cache-Control: max-age=86400
+	Content-Type: application/json
+	Content-Length: 128
+	```
+
+  - O servidor retornará na resposta HTTP um header `Vary` informando os campos, além do método e URI, que devem ser considerados para formar a chave de identificação do cache;
+  - Assim, nossa atual chave será `GET/users application/json`, e isso permitirá que o browser faça o cache de todas as representações.
+
+- O header `Vary` pode conter mais de um campo:
+
+	```
+	curl http://www.mysite.com/users \
+		-H "Accept: application/xml"
+		-H "Accept-Language: br"
+		-H "Accept-Encoding: gzip"
+
+	HTTP/1.1 200 OK
+	Vary: Accept, Accept-Language, Accept-Encoding
+	Cache-Control: max-age=86400
+	Content-Type: application/xml
+	Content-Language: br
+	Content-Encoding: gzip
+	Content-Length: 1024
+	```
+
+	- Nesse caso, nossa chave seria `GET/users application/xml:br:gzip`.
+
+### 2.19. Autenticação
 
 - Autenticação é uma parte importante de qualquer aplicação Web moderna, ela tem a missão de identificar quem está usando a aplicação e se ela tem permissão para usá-la.
 
@@ -395,7 +789,7 @@
 - Diferentemente de aplicações, quando um usuário utiliza um serviço ele também deve ser identificado, geralmente com seu email/senha, mas, enviar esses dados a cada requisição com certeza não é o ideal.
 	- Para tal, uma das soluções é no momento em que o usuário faz o login, o mesmo recebe um token baseado em suas credenciais e daí pra frente o token servirá de identificação nas próximas requisições.
 
-### 2.11. Identificação x Autenticação x Autorização
+### 2.20. Identificação x Autenticação x Autorização
 
 - `**Identificação:** Para esse conceito vamos usar um exemplo. O Google Maps permite desenvolvedores que possuam apenas a API Key pesquisar endereços. 
 	- Ou seja, eles usam apenas uma API Key para serem **identificados** e caso necessário o Google pode limitar o acesso para a quantidade de requisições, por exemplo;
@@ -405,7 +799,7 @@
 
 - **Autorização:** A autorização por sua vez tem o intuito de definir o que podemos ou não fazer, pois, mesmo que o sistema identifique e me autentique, minhas credenciais podem estar permitidas a apenas ler um determinado conteúdo, por exemplo.
 
-### 2.12. Autenticação com HTTP
+### 2.21. Autenticação com HTTP
 
 - Os mecanismos padrões de autenticação com HTTP são definidos como **Basic** (básica) e **Digest** (resumida).
 	- Esses dois mecanismos foram projetados seguindo as *constraints* REST, ou seja, eles são *stateless*.
@@ -449,7 +843,7 @@
 
 	- A diretiva de domínio **realm** é opcional e indica a proteção de um determinado espaço, pois uma mesma aplicação pode-se ter diferentes áreas protegidas usando diferentes esquemas de autenticação.
 
-### 2.13. Autenticação baseada em Token
+### 2.22. Autenticação baseada em Token
 
 - A autenticação baseada em token consiste em enviar o usuário/senha para o servidor e receber em troca um token que será informado em cada requisição através da header `Authorization`.
 
@@ -488,7 +882,7 @@
 	- Quando tiver muitos clientes você precisará gerir muitos tokens;
 	- Se cada cliente armazenado tiver mais de um token, isso pode dobrar facilmente.
 
-### 2.14. Stateless Authentication com OAuth
+### 2.23. Stateless Authentication com OAuth
 
 - Documentação oficial: https://oauth.net/
 
@@ -504,7 +898,7 @@
 
 - Pergunta: Isso realmente é *stateless*?
 
-### 2.15. Stateless Authentication com JWT (JSON Web Tokens)
+### 2.24. Stateless Authentication com JWT (JSON Web Tokens)
 
 - Documentação oficial: https://jwt.io/
 
