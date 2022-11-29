@@ -119,13 +119,13 @@ elementos dessa lista.
     - Esse é um método mais otimizado, se comparado ao método tradicional de herança utilizado por linguagens como o Java, uma vez que elimina redundâncias, evitando que sejam criadas várias cópias de um mesmo método;
     - O caminho realizado pela cadeia de protótipos está ilustrado na seguinte imagem:
 
-    ![Cadeia de protótipos filho, pai e avo](./imgs/prototype-chain-1.png)
+    ![Cadeia de protótipos filho, pai e avo](./imagens/prototype-chain-1.png)
 
     - A seta vermelha indica em que ponto da cadeia de protótipos o método procurado foi encontrado.
 
 - Esse mesmo processo acontece com nossa instância `p` de `Pessoa`, que tenta invocar o método `hasOwnProperty` sendo que nem o possui, e acabando encontrando-o em `Object.prototype`:
 
-    ![Cadeia de protótipos da instância p](./imgs/prototype-chain-2.png)
+    ![Cadeia de protótipos da instância p](./imagens/prototype-chain-2.png)
 
     - A propriedade `__proto__` da instância `p` está referenciando o `prototype` da sua função construtora. No caso anterior, como os objetos `filho`, `pai` e `avo` foram construídos a partir da notação literal, que é o mesmo que se tivesse sido feito `const avo = new Object();`, logo, a função construtora dos mesmos é `Object`, que significa que `Object.prototype` é o ancestral direto de `avo`.
 
@@ -192,7 +192,7 @@ elementos dessa lista.
 
     - Nesse caso, o trajeto pela cadeia de protótipos fica da seguinte forma:
 
-        ![Cadeia de protótipos Filho, Pai e Avo](./imgs/prototype-chain-3.png)
+        ![Cadeia de protótipos Filho, Pai e Avo](./imagens/prototype-chain-3.png)
 
     - Os percursos traçados em pontilhado não necessariamente são trechos por onde a busca foi realizada. Eles foram inseridos apenas para mostrar que pelo fato de `Avo`, `Filho` e `Pai` serem funções construtoras, elas "herdam" também as propriedades de `Function.prototype`, como `call`, `apply`, `bind`, etc.;
     - Pensamento para entender por quê o ancestral direto de um objeto instanciado é o protótio da função construtora e não a função construtora em sí:
@@ -211,7 +211,7 @@ elementos dessa lista.
 
     - A cadeia de protótipos de array é a seguinte:
 
-        ![Cadeia de protótipos f, p e a](./imgs/prototype-chain-4.png)
+        ![Cadeia de protótipos f, p e a](./imagens/prototype-chain-4.png)
 
     - Como já explicado, inicializar um array utilizando a notação tradicional de colchetes é o mesmo que fazer `const array = new Array();`, portanto, Arrays também são gerados a partir de funções construtoras, logo, seu ancestral direto é `Array.prototype`, onde métodos como `forEach`, `map`, `filter`, `reduce`, etc. estão armazenados.
 

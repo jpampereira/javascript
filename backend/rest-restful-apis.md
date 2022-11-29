@@ -1,6 +1,8 @@
 # Entendendo e documentando REST/RESTful APIs
 
-## Links
+- Anotações realizadas durante o curso.
+
+## 1. Links
 
 [Curso](https://www.udemy.com/share/101AtK/)
 

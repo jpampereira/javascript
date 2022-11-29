@@ -1,8 +1,10 @@
 # API REST em Node.JS aplicando testes (TDD) desde o princípio
 
+- Anotações realizadas durante o curso.
+
 ## 1. Links
 
-[Curso](/)
+[Curso](https://www.udemy.com/share/101uM8/)
 
 [Repositório do Projeto](/)
 
