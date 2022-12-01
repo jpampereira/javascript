@@ -6,7 +6,9 @@
 
 [Curso](https://www.udemy.com/share/101uM8/)
 
-[Repositório do Projeto](/)
+[Repositório do Projeto 1 - seubarriga](/)
+
+[Repositório do Projeto 2 - knowledge](/)
 
 [Gerador de JWT](https://jwt.io/)
 
@@ -372,7 +374,13 @@
 
 ### 7.1. O arquivo `knexfile.js`
 
-- No arquivo de configuração do Knex (`knexfile.js`) nós especificamos as informações referentes aos bancos de dados de testes, homologação e produção, como endereço, porta, usuário, senha, sistema gerenciador de banco de dados utilizado e sua versão. 
+- No arquivo de configuração do Knex (`knexfile.js`) nós especificamos as informações referentes aos bancos de dados de testes, homologação e produção, como endereço, porta, usuário, senha, sistema gerenciador de banco de dados utilizado e sua versão.
+
+- O arquivo pode ser criado manualmente ou através do seguinte comando;
+
+    ```
+    /node_modules/.bin/knex init
+    ```
 
 ### 7.2. Inicialização
 
@@ -416,7 +424,8 @@
     ```
     
     - No arquivo criado, deve se definir duas funções: `up` e `down`. A primeira é o comando que será executado para realizar a alteração desejada (ex.: criação de uma tabela, adição ou edição de uma coluna, etc.), enquanto a segunda é o comando que irá desfazer a alteração realizada (remoção de tabela, remoção de coluna, etc.), caso necessário;
-    - O parâmetro `knex` é o objeto que contém os métodos de migrations, enquanto o parâmetro `Promise` nos permite executar diferentes atividade paralelamente, através do método `Promise.all()`.
+    - O parâmetro `knex` é o objeto que contém os métodos de migrations, enquanto o parâmetro `Promise` nos permite executar diferentes atividade paralelamente, através do método `Promise.all()`;
+    - Não necessariamente o `up` vai ser uma função que cria uma tabela e `down` a que remove essa tabela. Caso uma aplicação não necessite mais de uma determinada tabela a partir de um momento, por exemplo, a função de `up` será para remover essa tabela e o `down` para desfazer essa ação, ou seja, recriar a tabela removida.
 
 - Exemplo da criação da tabela `users`:
 
@@ -463,6 +472,8 @@
 
     - Digamos que em um cenário hipotético você realiza o *rollback* em três migrations que foram inseridas uma a uma. Se você em seguida executar `migrate:latest`, ele irá refazer as três migrations, na ordem em que elas foram criadas.
         Agora, se você der um novo *rollback*, as três novamente serão desfeitas, pos o *rollback* não atua apenas em cima da última migration, e sim, no último conjunto de mudanças ocorridas, independentemente dela conter uma ou mais migrations.
+
+- A tabela `knex_migrations` é criada no banco de dados manipulado e armazena informações sobre as migrações realizadas, enquanto a tabela `knex_migrations_lock` é utilizada para fazer o controle das transações realizadas.
 
 ### 7.4. Seeds
 
@@ -560,6 +571,7 @@
     ```
 
 - Para retornar todas as colunas dos registros (`SELECT *`) é só não especificar nenhuma coluna dentro de `select()`.
+  - Nesse caso o `select()` pode ser omitido.
 
 ### 7.8. UPDATE
 
@@ -736,7 +748,8 @@
         .into(app);
     ```
 
-    - No código acima, o `consign` importa para a aplicação, em Express, os módulo de middlewares, rotas, serviços e autenticação.
+    - No código acima, o `consign` importa para a aplicação (`app`), em Express, os módulos de middlewares, rotas, serviços e autenticação;
+    - A variável `app` funciona como o centralizador desses métodos
     
 - O módulo deve respeitar o seguinte formato para que o `consign` consiga importá-lo:
 
@@ -930,9 +943,9 @@
     const encryptedPasswd = bcrypt.hashSync(passwd, salt);
     ```
 
-- O método `genSaltSync` gera um valor de 10 caractéres aleatórios para ser concatenado a senha. Assim, o valor do hash gerado sempre seja diferente, mesmo que a senha seja a mesma.
+- O método `genSaltSync` gera um valor de 10 caractéres aleatórios para ser concatenado a senha (de forma síncrona). Assim, o valor do hash gerado sempre seja diferente, mesmo que a senha seja a mesma.
 
-- O método `hashSync` gera o hash, utilizando a senha crua e a string aleatória, que será armazenado no banco no lugar da senha crua.
+- O método `hashSync` gera o hash (de forma síncrona), utilizando a senha crua e a string aleatória, que será armazenado no banco no lugar da senha crua.
 
 ### 11.2 Criação de usuário via signup
 
@@ -1177,6 +1190,6 @@
     app.use(cors({ origin: '*' }));
     ```
 
-- No caso acima, é configurado que qualquer origem pode realizar acesso a API, porém, em casos de aplicações reais, essa não é uma boa prática, sendo melhor limitar quais são as origens que podem utilizar os recursos da API.
+- No caso acima, é configurado que qualquer origem pode realizar acesso a API, porém, em casos de aplicações reais, essa não é uma boa prática, sendo melhor limitar quais são as origens/domínios que podem utilizar os recursos da API.
 
 - [Clique aqui](https://www.treinaweb.com.br/blog/o-que-e-cors-e-como-resolver-os-principais-erros) para entender mais a fundo a política de CORS. 
