@@ -633,7 +633,33 @@
     FROM accounts
     JOIN users ON accounts.user_id = users.id
     WHERE accounts.id = 1
-    ``` 
+    ```
+
+- Outra forma de realizar o JOIN utilizando *alias* para o nome das tabelas:
+
+    ```
+    const readComJoin2 = async () => {
+        const result = await app.db({ a: 'accounts', u: 'users' }).whereRaw('?? = ?? AND ?? = ?', ['u.id', 'a.user_id', 'a.id', 1]);
+        return result;
+    };
+    ```
+
+### 7.11. RAW
+
+- Em alguns momentos, o Query Builder pode não atender nossas necessidades, sendo necessário escrever queries na mão. Para isso utilizamos o método `raw`:
+
+    ```
+    const query = `
+        SELECT * 
+        FROM accounts 
+        JOIN users ON ?? = ??
+        WHERE ?? = ?
+    `;
+
+    const result = await app.db.raw(query, ['accounts.user_id', 'users.id', 'accounts.id', 1]);
+    ```
+
+    - Podemos utilizar *bindings* posicionais para interpolar valores em nossas queries. O símbolo `?` é para bindings de identificadores, como campos das tabelas, e `??` para binding de valores.
 
 ## 8. Requisições HTTP com Supertest
 
