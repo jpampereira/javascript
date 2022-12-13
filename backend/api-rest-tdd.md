@@ -985,7 +985,7 @@
 
 - Utilizamos a dependência `jwt` (JSON Web Token) para gerar o token de autenticação.
 
-- Para gerar o token, o JWT utiliza algumas informações do usuário (exemplo, nome, email e senha), além de um segredo, que deve ficar bem escondido no seu programa:
+- Para gerar o token, o JWT utiliza algumas informações do usuário (exemplo, nome, email e senha), além de um segredo, que deve ficar bem escondido no seu programa (utilizar um arquivo `.env` para armazenar essa informação):
 
 - Para gerar o token, é verificado se o usuário em questão está cadastrado e se a senha é a mesma que a salva no banco no formato de hash, utilizando o método `bcrypt.compareSync()`. Caso as senhas coincidam, um token é gerado, utilizando o método `encode` da dependência `jwt`, junto das informações do usuário e um segredo. Por fim, esse token gerado é retornado.
 
