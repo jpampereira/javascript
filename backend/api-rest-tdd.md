@@ -382,6 +382,9 @@
     /node_modules/.bin/knex init
     ```
 
+- Uma boa prática é armazenar as informações de conexão com o banco, como endereço IP, porta, usuário, senha, etc. em um arquivo `.env` para ficar escondido.
+  - Esse arquivo `.env` deve ser mapeado no `.gitignore` para não ser enviado para o repositório remoto, evitando o vazamento dessas informações.
+
 ### 7.2. Inicialização
 
 - Após a instalação da dependência, devemos integrá-la a nossa aplicação:
